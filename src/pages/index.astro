@@ -61,7 +61,7 @@ const steps = [
       Kort samengevat
     </h2>
     <div class="grid gap-4 md:grid-cols-3">
-      <article class="rounded-2xl border border-line p-6">
+      <article class="flex flex-col rounded-2xl border border-line p-6">
         <h3 class="text-sm tracking-wider">Prijs</h3>
         <p class="mt-2 font-display text-4xl text-brand">
           {formatMoney(servicePriceCents)}
@@ -72,14 +72,14 @@ const steps = [
           <strong>{formatMoney(cheapestWithStringCents)}</strong>
         </p>
         <a
-          class="mt-2 inline-flex min-h-11 items-center font-semibold text-brand underline underline-offset-4"
+          class="mt-auto inline-flex min-h-11 items-center pt-3 font-semibold text-brand underline underline-offset-4"
           href={withBase('/prijzen')}
         >
           Alle prijzen
         </a>
       </article>
 
-      <article class="rounded-2xl border border-line p-6">
+      <article class="flex flex-col rounded-2xl border border-line p-6">
         <h3 class="text-sm tracking-wider">Afgeven en ophalen</h3>
         <p class="mt-2 text-lg font-semibold">{handover.venue}</p>
         <p class="text-ink-soft">{handover.address}</p>
@@ -92,14 +92,14 @@ const steps = [
           ))}
         </ul>
         <a
-          class="mt-2 inline-flex min-h-11 items-center font-semibold text-brand underline underline-offset-4"
+          class="mt-auto inline-flex min-h-11 items-center pt-3 font-semibold text-brand underline underline-offset-4"
           href={withBase('/contact')}
         >
           Route en contact
         </a>
       </article>
 
-      <article class="rounded-2xl border border-line p-6">
+      <article class="flex flex-col rounded-2xl border border-line p-6">
         <h3 class="text-sm tracking-wider">Snel terug</h3>
         <p class="mt-2 font-display text-3xl text-brand">Enkele dagen</p>
         <p class="mt-1 text-ink-soft">en je speelt weer met volle power.</p>
