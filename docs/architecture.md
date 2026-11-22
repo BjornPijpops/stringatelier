@@ -68,3 +68,11 @@ Decided with the `ux-designer` role, from the visitor's point of view (a player 
 - **Explain, don't repeat.** The string section ("Welke snaar past bij jou?") has no prices. It helps visitors choose: one card per type (BG-65, BG-80, BG-80 Power) with a one-line character, 1-5 dot ratings for power, control and durability, feel, thickness and a "best for" line. The ratings come from a comparison table supplied by the owner, translated to a 1-5 scale in `data/pricing.ts`. Dots are decorative; screen readers get "3 van 5" text (`RatingDots.astro`).
 - **Grouped by type.** Visitors choose a type first and a colour second, so colours are listed on the card, not as separate cards. The flat `stringOptions` list for the calculator is derived from `stringFamilies`.
 - **Next step.** The page ends with a call to action to the contact page.
+
+## Visual system and home page (UX)
+
+- **Alternating bands.** Pages are built from full-width `Section` bands (`white`, `soft`, `brand`) so the site is not one white sheet. `BaseLayout` no longer wraps `<main>` in a container; each `Section` does. Page intros use `PageHeader`, and closing calls to action use `CtaBand`. Buttons use `ButtonLink` (`primary`, `secondary`, `inverse`).
+- **Blue only.** Colours stay within the brand blue tokens, matching the flyer and the club. The darker footer follows the closing blue band.
+- **Home page.** Hero with two clear actions (prices, contact), then three facts at a glance (price, handover slots, turnaround), a three-step "Zo werkt het", and a contact CTA. Visitors mostly arrive before or after training, so the key facts sit above the fold on mobile.
+- **Logo.** `Logo.astro` picks up `src/assets/logo.svg|png|webp` automatically (header and a desktop hero slot). Without a file it renders the text wordmark, so no code change is needed when the logo arrives.
+- **Footer.** Brand line, navigation and email, with 44px tap targets.

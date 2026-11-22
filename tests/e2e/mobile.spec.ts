@@ -216,8 +216,34 @@ for (const phone of PHONES) {
       page,
     }) => {
       await page.goto('contact/');
-      await expect(page.locator('a[href^="mailto:"]')).toHaveCount(1);
-      await expect(page.locator('a[href^="tel:+32"]')).toHaveCount(2);
+      await expect(page.locator('main a[href^="mailto:"]')).toHaveCount(1);
+      await expect(page.locator('main a[href^="tel:+32"]')).toHaveCount(2);
+    });
+
+    test('home gives clear next steps and the key facts', async ({ page }) => {
+      await page.goto('');
+      const main = page.locator('main');
+      await expect(
+        main.getByRole('link', { name: 'Bekijk de prijzen' }),
+      ).toBeVisible();
+      await expect(
+        main.getByRole('link', { name: 'Contact', exact: true }),
+      ).toBeVisible();
+      await expect(main).toContainText('Sporthal Herkules');
+      await expect(main).toContainText('12,00');
+      await expect(main).toContainText('16,50');
+
+      await main.getByRole('link', { name: 'Bekijk de prijzen' }).click();
+      await expect(page).toHaveURL(/\/prijzen\/?$/);
+    });
+
+    test('footer repeats navigation and the email address', async ({
+      page,
+    }) => {
+      await page.goto('prijzen/');
+      const footer = page.locator('footer');
+      await expect(footer.getByRole('link')).toHaveCount(4);
+      await expect(footer.locator('a[href^="mailto:"]')).toHaveCount(1);
     });
 
     test('map loads on demand and fits the screen', async ({ page }) => {

@@ -1,5 +1,6 @@
 ---
 import Container from './Container.astro';
+import Logo from './Logo.astro';
 import { navItems, siteName } from '../data/site';
 import { withBase } from '../lib/withBase';
 
@@ -10,11 +11,8 @@ const isCurrent = (href: string) =>
 
 <header class="border-b border-line bg-surface">
   <Container class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-4">
-    <a
-      href={withBase('/')}
-      class="flex min-h-11 items-center font-display text-xl tracking-tight text-brand-strong uppercase"
-    >
-      String<span class="rounded bg-brand px-1.5 text-white">Atelier</span>
+    <a href={withBase('/')} class="flex min-h-11 items-center">
+      <Logo fallback class="h-10" />
       <span class="sr-only">{siteName} home</span>
     </a>
     <nav aria-label="Hoofdnavigatie">

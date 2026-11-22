@@ -1,16 +1,41 @@
 ---
 import Container from './Container.astro';
-import { siteName, siteTagline } from '../data/site';
+import { contactEmail } from '../data/contact';
+import { navItems, siteName, siteTagline } from '../data/site';
+import { withBase } from '../lib/withBase';
 
 const year = new Date().getFullYear();
+const linkClass =
+  'inline-flex min-h-11 min-w-11 items-center underline decoration-white/40 underline-offset-4 hover:decoration-white';
 ---
 
-<footer class="mt-auto bg-brand-strong text-white">
-  <Container class="flex flex-col gap-1 py-8 text-sm sm:flex-row sm:justify-between">
-    <p class="font-display tracking-tight uppercase">{siteName}</p>
-    <p class="text-white/70">{siteTagline}</p>
-    <p class="text-white/70">
-      &copy; {year} {siteName}
-    </p>
+<footer class="bg-brand-strong text-white">
+  <Container class="grid gap-8 py-10 text-sm sm:grid-cols-3">
+    <div>
+      <p class="font-display text-base tracking-tight uppercase">{siteName}</p>
+      <p class="mt-2 text-white/80">{siteTagline}</p>
+    </div>
+    <nav aria-label="Voetnavigatie">
+      <ul class="flex flex-wrap gap-x-4 sm:flex-col">
+        {navItems.map((item) => (
+          <li>
+            <a class={linkClass} href={withBase(item.href)}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div>
+      <p class="text-white/80">Vragen? Mail ons</p>
+      <a class={linkClass} href={`mailto:${contactEmail}`}>
+        {contactEmail}
+      </a>
+    </div>
   </Container>
+  <div class="border-t border-white/20">
+    <Container class="py-4 text-sm text-white/80">
+      {`© ${year} ${siteName}`}
+    </Container>
+  </div>
 </footer>

@@ -1,24 +1,138 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import ButtonLink from '../components/ButtonLink.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Logo from '../components/Logo.astro';
 import { siteTagline } from '../data/site';
+import { handover } from '../data/contact';
+import { servicePriceCents, stringOptions } from '../data/pricing';
+import { formatMoney } from '../lib/formatMoney';
+import { withBase } from '../lib/withBase';
+
+const cheapestWithStringCents =
+  servicePriceCents + Math.min(...stringOptions.map((o) => o.priceCents));
+
+const steps = [
+  {
+    title: 'Kies je snaar',
+    text: 'Twijfel je? Bekijk de snaren en bereken je prijs. Eigen snaar? Die mag je gewoon meebrengen.',
+  },
+  {
+    title: 'Geef je racket af',
+    text: `Tijdens de training van Schubad in ${handover.venue}.`,
+  },
+  {
+    title: 'Haal hem op',
+    text: 'Binnen enkele dagen is je racket terug, klaar voor je volgende wedstrijd.',
+  },
+];
 ---
 
 <BaseLayout>
-  <section class="relative overflow-hidden rounded-2xl bg-surface-alt px-6 py-14 sm:px-12 sm:py-20">
+  <Section tone="soft" class="relative overflow-hidden">
     <div
       aria-hidden="true"
       class="absolute -top-24 -right-24 size-72 rounded-full bg-brand-soft sm:size-96"
     ></div>
-    <div class="relative">
-      <p class="mb-4 inline-block rounded bg-brand px-2 py-1 text-sm font-bold tracking-widest text-white uppercase">
-        Badminton restringing
-      </p>
-      <h1 class="max-w-2xl text-4xl sm:text-6xl">{siteTagline}</h1>
-      <p class="mt-6 max-w-xl text-lg text-ink-soft">
-        Is je racket toe aan nieuwe snaren? Wij geven het de spanning die het
-        verdient: snel en met oog voor detail. Breng je racket binnen bij de
-        club en speel binnen enkele dagen weer met volle power!
-      </p>
+    <div class="relative flex items-center justify-between gap-8">
+      <div>
+        <p class="mb-4 inline-block rounded bg-brand px-2 py-1 text-sm font-bold tracking-widest text-white uppercase">
+          Badminton restringing
+        </p>
+        <h1 class="max-w-2xl text-4xl sm:text-6xl">{siteTagline}</h1>
+        <p class="mt-6 max-w-xl text-lg text-ink-soft">
+          Is je racket toe aan nieuwe snaren? Wij geven het de spanning die het
+          verdient: snel en met oog voor detail.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <ButtonLink href={withBase('/prijzen')}>Bekijk de prijzen</ButtonLink>
+          <ButtonLink href={withBase('/contact')} variant="secondary">
+            Contact
+          </ButtonLink>
+        </div>
+      </div>
+      <Logo class="hidden h-48 shrink-0 lg:block" />
     </div>
-  </section>
+  </Section>
+
+  <Section aria-labelledby="facts-heading">
+    <h2 id="facts-heading" class="sr-only">
+      Kort samengevat
+    </h2>
+    <div class="grid gap-4 md:grid-cols-3">
+      <article class="rounded-2xl border border-line p-6">
+        <h3 class="text-sm tracking-wider">Prijs</h3>
+        <p class="mt-2 font-display text-4xl text-brand">
+          {formatMoney(servicePriceCents)}
+        </p>
+        <p class="text-ink-soft">per racket, snaar niet inbegrepen</p>
+        <p class="mt-3">
+          Met snaar vanaf{' '}
+          <strong>{formatMoney(cheapestWithStringCents)}</strong>
+        </p>
+        <a
+          class="mt-2 inline-flex min-h-11 items-center font-semibold text-brand underline underline-offset-4"
+          href={withBase('/prijzen')}
+        >
+          Alle prijzen
+        </a>
+      </article>
+
+      <article class="rounded-2xl border border-line p-6">
+        <h3 class="text-sm tracking-wider">Afgeven en ophalen</h3>
+        <p class="mt-2 text-lg font-semibold">{handover.venue}</p>
+        <p class="text-ink-soft">{handover.address}</p>
+        <ul class="mt-3 text-sm">
+          {handover.slots.map((slot) => (
+            <li class="flex justify-between py-0.5">
+              <span>{slot.day}</span>
+              <span class="tabular-nums">{slot.time}</span>
+            </li>
+          ))}
+        </ul>
+        <a
+          class="mt-2 inline-flex min-h-11 items-center font-semibold text-brand underline underline-offset-4"
+          href={withBase('/contact')}
+        >
+          Route en contact
+        </a>
+      </article>
+
+      <article class="rounded-2xl border border-line p-6">
+        <h3 class="text-sm tracking-wider">Snel terug</h3>
+        <p class="mt-2 font-display text-3xl text-brand">Enkele dagen</p>
+        <p class="mt-1 text-ink-soft">en je speelt weer met volle power.</p>
+      </article>
+    </div>
+  </Section>
+
+  <Section tone="soft" aria-labelledby="steps-heading">
+    <h2 id="steps-heading" class="text-xl sm:text-2xl">
+      Zo werkt het
+    </h2>
+    <ol class="mt-8 grid gap-6 md:grid-cols-3">
+      {steps.map((step, index) => (
+        <li class="flex gap-4">
+          <span
+            aria-hidden="true"
+            class="grid size-11 shrink-0 place-items-center rounded-full bg-brand font-display text-lg text-white"
+          >
+            {index + 1}
+          </span>
+          <div>
+            <h3 class="text-base">{step.title}</h3>
+            <p class="mt-1 text-ink-soft">{step.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <CtaBand
+    heading="Vragen over je racket?"
+    text="Twijfel je over de snaar of wil je iets afspreken? Stuur ons gerust een berichtje."
+    href={withBase('/contact')}
+    label="Neem contact op"
+  />
 </BaseLayout>

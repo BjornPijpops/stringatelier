@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Section from '../components/Section.astro';
 import LocationMap from '../components/LocationMap.astro';
 import { contactEmail, contactPeople, handover } from '../data/contact';
 import { formatBelgianPhone, toTelHref } from '../lib/phone';
@@ -12,61 +14,63 @@ const linkClass =
   title="Contact"
   description="Neem contact op met StringAtelier in Herk-de-Stad voor het besnaren van je badmintonracket."
 >
-  <h1 class="text-3xl sm:text-5xl">Contact</h1>
-  <p class="mt-4 max-w-xl text-ink-soft">
-    Vragen over besnaren of een racket afgeven? Neem gerust contact op.
-  </p>
+  <PageHeader
+    title="Contact"
+    intro="Vragen over besnaren of een racket afgeven? Neem gerust contact op."
+  />
 
-  <div class="mt-10 grid gap-6 sm:grid-cols-2">
-    <section
-      class="rounded-2xl bg-surface-alt p-6"
-      aria-labelledby="reach-heading"
-    >
-      <h2 id="reach-heading" class="text-xl">
-        Bereik ons
-      </h2>
-      <dl class="mt-4 space-y-4">
-        <div>
-          <dt class="text-sm text-ink-soft">E-mail</dt>
-          <dd>
-            <a class={linkClass} href={`mailto:${contactEmail}`}>
-              {contactEmail}
-            </a>
-          </dd>
-        </div>
-        {contactPeople.map((person) => (
+  <Section>
+    <div class="grid gap-6 sm:grid-cols-2">
+      <section
+        class="rounded-2xl bg-surface-alt p-6"
+        aria-labelledby="reach-heading"
+      >
+        <h2 id="reach-heading" class="text-xl">
+          Bereik ons
+        </h2>
+        <dl class="mt-4 space-y-4">
           <div>
-            <dt class="text-sm text-ink-soft">{person.name}</dt>
+            <dt class="text-sm text-ink-soft">E-mail</dt>
             <dd>
-              <a class={linkClass} href={toTelHref(person.phone)}>
-                {formatBelgianPhone(person.phone)}
+              <a class={linkClass} href={`mailto:${contactEmail}`}>
+                {contactEmail}
               </a>
             </dd>
           </div>
-        ))}
-      </dl>
-    </section>
+          {contactPeople.map((person) => (
+            <div>
+              <dt class="text-sm text-ink-soft">{person.name}</dt>
+              <dd>
+                <a class={linkClass} href={toTelHref(person.phone)}>
+                  {formatBelgianPhone(person.phone)}
+                </a>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
-    <section
-      class="rounded-2xl bg-surface-alt p-6"
-      aria-labelledby="handover-heading"
-    >
-      <h2 id="handover-heading" class="text-xl">
-        Afgeven en ophalen
-      </h2>
-      <p class="mt-4 text-ink-soft">{handover.description}</p>
-      <ul class="mt-4 divide-y divide-line">
-        {handover.slots.map((slot) => (
-          <li class="flex justify-between py-2">
-            <span class="font-semibold">{slot.day}</span>
-            <span class="tabular-nums">{slot.time}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  </div>
+      <section
+        class="rounded-2xl bg-surface-alt p-6"
+        aria-labelledby="handover-heading"
+      >
+        <h2 id="handover-heading" class="text-xl">
+          Afgeven en ophalen
+        </h2>
+        <p class="mt-4 text-ink-soft">{handover.description}</p>
+        <ul class="mt-4 divide-y divide-line">
+          {handover.slots.map((slot) => (
+            <li class="flex justify-between py-2">
+              <span class="font-semibold">{slot.day}</span>
+              <span class="tabular-nums">{slot.time}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </Section>
 
-  <section class="mt-10" aria-labelledby="map-heading">
+  <Section tone="soft" aria-labelledby="map-heading">
     <h2 id="map-heading" class="mb-4 text-xl">
       Waar vind je ons?
     </h2>
@@ -75,5 +79,5 @@ const linkClass =
       address={handover.address}
       coordinates={handover.coordinates}
     />
-  </section>
+  </Section>
 </BaseLayout>

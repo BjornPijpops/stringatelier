@@ -1,0 +1,34 @@
+---
+interface Props {
+  /** Background band: white, soft blue or brand blue. */
+  tone?: 'white' | 'soft' | 'brand';
+  /** Less vertical padding, for page headers. */
+  compact?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const {
+  tone = 'white',
+  compact = false,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const tones = {
+  white: 'bg-surface',
+  soft: 'bg-surface-alt',
+  brand: 'bg-brand text-white',
+};
+---
+
+<section class:list={[tones[tone], className]} {...rest}>
+  <div
+    class:list={[
+      'mx-auto w-full max-w-5xl px-4 sm:px-6',
+      compact ? 'py-10 sm:py-14' : 'py-12 sm:py-16',
+    ]}
+  >
+    <slot />
+  </div>
+</section>

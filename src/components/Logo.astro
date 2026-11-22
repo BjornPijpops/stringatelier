@@ -1,0 +1,30 @@
+---
+interface Props {
+  /** Show the text wordmark when no logo file exists (header). Off for decorative uses. */
+  fallback?: boolean;
+  class?: string;
+}
+
+const { fallback = false, class: className = '' } = Astro.props;
+
+// Drop `logo.svg`, `logo.png` or `logo.webp` into src/assets and it is used automatically.
+const logos = import.meta.glob<string>('../assets/logo.{svg,png,webp}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const logoUrl = Object.values(logos)[0];
+---
+
+{logoUrl ? (
+  <img src={logoUrl} alt="" class:list={['w-auto', className]} />
+) : (
+  fallback && (
+    <span
+      aria-hidden="true"
+      class="font-display text-xl tracking-tight text-brand-strong uppercase"
+    >
+      String<span class="rounded bg-brand px-1.5 text-white">Atelier</span>
+    </span>
+  )
+)}
