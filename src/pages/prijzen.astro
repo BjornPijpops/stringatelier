@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PriceTable from '../components/PriceTable.astro';
 import PriceCalculator from '../components/PriceCalculator.astro';
+import StringFamilyCard from '../components/StringFamilyCard.astro';
 import { formatMoney } from '../lib/formatMoney';
-import { servicePriceCents, stringOptions } from '../data/pricing';
+import { withBase } from '../lib/withBase';
+import { servicePriceCents, stringFamilies } from '../data/pricing';
 ---
 
 <BaseLayout
@@ -11,33 +12,61 @@ import { servicePriceCents, stringOptions } from '../data/pricing';
   description="Bekijk de prijzen voor het besnaren van je badmintonracket: €12 per racket, plus de snaar naar keuze."
 >
   <h1 class="text-3xl sm:text-5xl">Prijzen</h1>
+  <p class="mt-4 max-w-xl text-ink-soft">
+    Eén vast tarief per racket, plus de snaar die bij je past. Of breng je eigen
+    snaar mee.
+  </p>
 
   <section
-    class="mt-10 rounded-2xl bg-surface-alt p-6 sm:p-8"
-    aria-labelledby="service-heading"
+    class="mt-8 grid gap-6 md:grid-cols-2 md:has-[#calculator.hidden]:grid-cols-1"
+    aria-label="Prijs en rekenhulp"
   >
-    <h2 id="service-heading" class="text-xl">
-      Besnaren
-    </h2>
-    <p class="mt-3 flex flex-wrap items-baseline gap-x-3 font-display text-4xl text-brand">
-      <span>{formatMoney(servicePriceCents)}</span>
-      <span class="text-base text-ink-soft">per racket</span>
-    </p>
-    <p class="mt-4 max-w-xl text-ink-soft">
-      Dit is het tarief voor onze service. De snaar komt daar bovenop, tenzij je
-      je eigen snaar meebrengt: dan betaal je alleen de servicekosten.
-    </p>
+    <div class="flex flex-col justify-center rounded-2xl bg-surface-alt p-6 sm:p-8">
+      <h2 class="text-xl">Besnaren</h2>
+      <p class="mt-3 flex flex-wrap items-baseline gap-x-3 font-display text-5xl text-brand">
+        <span>{formatMoney(servicePriceCents)}</span>
+        <span class="text-base text-ink-soft">per racket</span>
+      </p>
+      <p class="mt-4 text-ink-soft">
+        Dat is ons tarief voor het besnaren. De snaar komt daar bovenop.
+      </p>
+      <p class="mt-4 rounded-lg bg-white px-4 py-3 font-semibold">
+        Eigen snaar bij? Dan betaal je enkel {formatMoney(servicePriceCents)}.
+      </p>
+    </div>
+    <PriceCalculator />
   </section>
 
-  <section class="mt-10" aria-labelledby="strings-heading">
+  <section class="mt-14" aria-labelledby="strings-heading">
     <h2 id="strings-heading" class="text-xl">
-      Snaren
+      Kies je snaar
     </h2>
-    <p class="mt-3 mb-5 max-w-xl text-ink-soft">
-      Prijs per snaar, bovenop de servicekosten per racket.
+    <p class="mt-3 mb-6 max-w-xl text-ink-soft">
+      Alle prijzen zijn all-in: besnaren én snaar, per racket.
     </p>
-    <PriceTable options={stringOptions} />
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {stringFamilies.map((family) => (
+        <StringFamilyCard {family} {servicePriceCents} />
+      ))}
+    </div>
   </section>
 
-  <PriceCalculator />
+  <section
+    class="mt-14 rounded-2xl bg-brand p-6 text-white sm:p-8"
+    aria-labelledby="cta-heading"
+  >
+    <h2 id="cta-heading" class="text-xl text-white">
+      Klaar om te besnaren?
+    </h2>
+    <p class="mt-3 max-w-xl text-brand-soft">
+      Breng je racket mee naar de training in Sporthal Herkules, of stuur ons
+      eerst een berichtje.
+    </p>
+    <a
+      href={withBase('/contact')}
+      class="mt-5 inline-flex min-h-11 items-center rounded-full bg-white px-6 font-semibold text-brand hover:bg-brand-soft"
+    >
+      Contact en afgifte
+    </a>
+  </section>
 </BaseLayout>

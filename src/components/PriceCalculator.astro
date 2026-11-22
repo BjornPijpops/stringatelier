@@ -1,17 +1,20 @@
 ---
-import { stringOptions } from '../data/pricing';
+import { stringFamilies } from '../data/pricing';
 import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
+
+const stepButton =
+  'grid size-11 shrink-0 place-items-center rounded-lg bg-white text-2xl font-bold text-brand hover:bg-brand-soft';
 ---
 
 <section
   id="calculator"
-  class="mt-10 hidden rounded-2xl border-2 border-brand p-6 sm:p-8"
+  class="hidden rounded-2xl bg-brand p-6 text-white sm:p-8"
   aria-labelledby="calculator-heading"
 >
-  <h2 id="calculator-heading" class="text-xl">
+  <h2 id="calculator-heading" class="text-xl text-white">
     Bereken je prijs
   </h2>
-  <form class="mt-5 grid gap-5 sm:grid-cols-2" novalidate>
+  <form class="mt-5 grid gap-5" novalidate>
     <div>
       <label for="calc-string" class="block text-sm font-semibold">
         Snaar
@@ -19,46 +22,68 @@ import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
       <select
         id="calc-string"
         name="string"
-        class="mt-1 min-h-11 w-full rounded-lg border border-line bg-surface px-3 py-2 text-base"
+        class="mt-1 min-h-11 w-full rounded-lg border border-white bg-white px-3 py-2 text-base text-ink"
       >
-        <option value={OWN_STRING_VALUE}>Eigen snaar</option>
-        {stringOptions.map((option) => (
-          <option value={option.id}>{option.name}</option>
+        <option value={OWN_STRING_VALUE}>Eigen snaar (alleen service)</option>
+        {stringFamilies.map((family) => (
+          <optgroup label={family.name}>
+            {family.variants.map((variant) => (
+              <option value={variant.id}>
+                {family.name} {variant.colour}
+              </option>
+            ))}
+          </optgroup>
         ))}
       </select>
-      <p class="mt-1 text-sm text-ink-soft">
-        Eigen snaar: je betaalt alleen de servicekosten.
-      </p>
     </div>
     <div>
       <label for="calc-quantity" class="block text-sm font-semibold">
         Aantal rackets
       </label>
-      <input
-        id="calc-quantity"
-        name="quantity"
-        type="number"
-        min="1"
-        max={MAX_QUANTITY}
-        step="1"
-        value="1"
-        inputmode="numeric"
-        class="mt-1 min-h-11 w-full rounded-lg border border-line bg-surface px-3 py-2 text-base"
-      />
+      <div class="mt-1 flex gap-2">
+        <button
+          type="button"
+          class={stepButton}
+          data-step="-1"
+          aria-label="Eén racket minder"
+        >
+          &minus;
+        </button>
+        <input
+          id="calc-quantity"
+          name="quantity"
+          type="number"
+          min="1"
+          max={MAX_QUANTITY}
+          step="1"
+          value="1"
+          inputmode="numeric"
+          class="min-h-11 w-full min-w-0 rounded-lg border border-white bg-white px-3 py-2 text-center text-base text-ink [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
+        <button
+          type="button"
+          class={stepButton}
+          data-step="1"
+          aria-label="Eén racket meer"
+        >
+          +
+        </button>
+      </div>
     </div>
   </form>
-  <p
-    class="mt-6 text-sm text-ink-soft"
-    id="calc-breakdown"
-    aria-live="polite"
-  ></p>
-  <p
-    class="mt-1 font-display text-4xl text-brand"
-    id="calc-total"
-    aria-live="polite"
-  ></p>
+  <div class="mt-6 border-t border-white/30 pt-5">
+    <p
+      class="text-sm text-brand-soft"
+      id="calc-breakdown"
+      aria-live="polite"
+    ></p>
+    <p
+      class="mt-1 font-display text-5xl text-white"
+      id="calc-total"
+      aria-live="polite"
+    ></p>
+  </div>
 </section>
-
 <script>
   import { calculateTotal } from '../lib/calculateTotal';
   import { formatMoney } from '../lib/formatMoney';
@@ -103,9 +128,22 @@ import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
   }
 
   if (root) {
-    // Hidden without JavaScript: the price tables above stay the source of truth.
+    // Hidden without JavaScript: the price cards stay the source of truth.
     root.classList.remove('hidden');
     root.addEventListener('input', render);
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-step]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          if (!quantityInput) return;
+          const current = parseQuantity(quantityInput.value) ?? 1;
+          const next = current + Number(button.dataset.step);
+          quantityInput.value = String(
+            Math.min(MAX_QUANTITY, Math.max(1, next)),
+          );
+          render();
+        });
+      });
     render();
   }
 </script>

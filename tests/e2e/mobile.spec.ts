@@ -156,6 +156,44 @@ for (const phone of PHONES) {
           'tussen 1 en',
         );
       });
+      test('stepper buttons change the quantity within its limits', async ({
+        page,
+      }) => {
+        const quantity = page.locator('#calc-quantity');
+        await page.getByRole('button', { name: 'Eén racket meer' }).click();
+        await expect(quantity).toHaveValue('2');
+        await expect(page.locator('#calc-total')).toContainText('24,00');
+
+        await page.getByRole('button', { name: 'Eén racket minder' }).click();
+        await page.getByRole('button', { name: 'Eén racket minder' }).click();
+        await expect(quantity).toHaveValue('1');
+      });
+    });
+
+    test.describe('prijzen string cards', () => {
+      test.beforeEach(async ({ page }) => {
+        await page.goto('prijzen/');
+      });
+
+      test('show all-in prices grouped by string type', async ({ page }) => {
+        await expect(page.locator('article h3')).toHaveText([
+          'BG-65',
+          'BG-80',
+          'BG-80 Power',
+        ]);
+        await expect(page.locator('article').first()).toContainText('16,50');
+        await expect(page.locator('article').nth(1)).toContainText('18,00');
+      });
+
+      test('the ? explanation opens by tap and is hidden before', async ({
+        page,
+      }) => {
+        const summary = page.getByText('Wat is BG-65?');
+        const answer = page.getByText(/veelgebruikte, duurzame snaar/);
+        await expect(answer).toBeHidden();
+        await summary.click();
+        await expect(answer).toBeVisible();
+      });
     });
 
     test('contact links are tappable mailto and tel links', async ({
