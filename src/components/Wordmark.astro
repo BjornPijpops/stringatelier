@@ -1,0 +1,17 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<span
+  aria-hidden="true"
+  class:list={[
+    'font-display text-xl tracking-tight text-brand-strong uppercase',
+    className,
+  ]}
+>
+  String<span class="rounded bg-brand px-1.5 text-white">Atelier</span>
+</span>

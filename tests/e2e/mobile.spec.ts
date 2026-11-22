@@ -237,6 +237,21 @@ for (const phone of PHONES) {
       await expect(page).toHaveURL(/\/prijzen\/?$/);
     });
 
+    test('favicon and touch icon are declared and load', async ({
+      page,
+      request,
+    }) => {
+      await page.goto('');
+      for (const rel of ['icon', 'apple-touch-icon']) {
+        const href = await page
+          .locator(`link[rel="${rel}"]`)
+          .getAttribute('href');
+        expect(href).toBeTruthy();
+        const response = await request.get(new URL(href!, page.url()).href);
+        expect(response.ok()).toBe(true);
+        expect(response.headers()['content-type']).toContain('image/png');
+      }
+    });
     test('footer repeats the navigation', async ({ page }) => {
       await page.goto('prijzen/');
       const footer = page.locator('footer');
