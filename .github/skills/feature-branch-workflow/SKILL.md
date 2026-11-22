@@ -24,7 +24,15 @@ Prefixes: `feature/`, `fix/`, `chore/`, `docs/`, `refactor/`.
 1. Build + tests green, QA PASS, reviewer APPROVED, docs updated.
 2. Open a PR to `main` (`gh pr create` if available) summarizing changes and test evidence.
 3. **STOP and ask the user for approval** (ask_user) showing the summary.
-4. Only after explicit approval: merge (prefer squash merge) and delete the branch.
+4. Only after explicit approval: merge (fast-forward or squash). **Do not delete the branch yet.**
+5. The user does a visual check of the live site. Ask for the go to start the next feature.
+6. On that go, clean up the previous, finished feature branch first:
+   ```
+   git switch main; git pull --ff-only
+   git branch -d <previous-branch>
+   git push origin --delete <previous-branch>
+   ```
+   Use `-d` (not `-D`) so unmerged work is never lost.
 
 ## Hard rules
 - NEVER commit or push to `main` without explicit user approval for that specific merge.

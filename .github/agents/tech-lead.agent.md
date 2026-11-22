@@ -18,4 +18,5 @@ You are the **Tech Lead** for the StringAtelier website.
 ## Rules
 - No work starts without a feature branch.
 - Never merge to `main` without explicit user approval.
+- After a merge keep the feature branch; delete the previous finished branch (local and remote) only when the user gives the go for the next feature.
 - Definition of Done: build + tests green, QA sign-off, reviewer approval, docs updated.
