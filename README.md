@@ -26,7 +26,7 @@ CI (`.github/workflows/ci.yml`) runs lint, format check, type check, unit tests,
 
 ## Deployment
 
-The site is published at https://bjornpijpops.github.io/stringatelier/ through GitHub Pages. Every push to `main` triggers `.github/workflows/deploy.yml`, which builds the site and deploys `dist/`. This needs repository Settings → Pages → Source set to **GitHub Actions**. When adding internal links or assets, build them from `import.meta.env.BASE_URL` so they work under `/stringatelier`.
+The site is published at https://bjornpijpops.github.io/stringatelier/ through GitHub Pages. Deploys run through `.github/workflows/deploy.yml`, which starts only after the CI workflow has succeeded on `main` (so a broken push is never published) and can also be started manually. It builds the site and deploys `dist/`. This needs repository Settings → Pages → Source set to **GitHub Actions**. When adding internal links or assets, build them from `import.meta.env.BASE_URL` so they work under `/stringatelier`.
 
 ```
 
