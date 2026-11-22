@@ -1,7 +1,6 @@
 ---
 import Container from './Container.astro';
-import { contactEmail } from '../data/contact';
-import { navItems, siteName, siteTagline } from '../data/site';
+import { navItems, siteName } from '../data/site';
 import { withBase } from '../lib/withBase';
 
 const year = new Date().getFullYear();
@@ -10,13 +9,15 @@ const linkClass =
 ---
 
 <footer class="bg-ink text-white">
-  <Container class="grid gap-8 py-10 text-sm sm:grid-cols-3">
-    <div>
-      <p class="font-display text-base tracking-tight uppercase">{siteName}</p>
-      <p class="mt-2 text-white/80">{siteTagline}</p>
-    </div>
+  <Container class="flex flex-col gap-2 py-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-white/80">
+      <span class="font-display tracking-tight text-white uppercase">
+        {siteName}
+      </span>
+      {` · © ${year}`}
+    </p>
     <nav aria-label="Voetnavigatie">
-      <ul class="flex flex-wrap gap-x-4 sm:flex-col">
+      <ul class="flex flex-wrap gap-x-4">
         {navItems.map((item) => (
           <li>
             <a class={linkClass} href={withBase(item.href)}>
@@ -26,16 +27,5 @@ const linkClass =
         ))}
       </ul>
     </nav>
-    <div>
-      <p class="text-white/80">Vragen? Mail ons</p>
-      <a class={linkClass} href={`mailto:${contactEmail}`}>
-        {contactEmail}
-      </a>
-    </div>
   </Container>
-  <div class="border-t border-white/20">
-    <Container class="py-4 text-sm text-white/80">
-      {`© ${year} ${siteName}`}
-    </Container>
-  </div>
 </footer>

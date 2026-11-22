@@ -237,13 +237,10 @@ for (const phone of PHONES) {
       await expect(page).toHaveURL(/\/prijzen\/?$/);
     });
 
-    test('footer repeats navigation and the email address', async ({
-      page,
-    }) => {
+    test('footer repeats the navigation', async ({ page }) => {
       await page.goto('prijzen/');
       const footer = page.locator('footer');
-      await expect(footer.getByRole('link')).toHaveCount(4);
-      await expect(footer.locator('a[href^="mailto:"]')).toHaveCount(1);
+      await expect(footer.getByRole('link')).toHaveCount(3);
     });
 
     test('map loads on demand and fits the screen', async ({ page }) => {
