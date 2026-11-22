@@ -33,7 +33,6 @@ export interface StringFamily {
   /** Thickness, e.g. "0,70 mm". */
   readonly gauge: string;
   readonly feel: string;
-  readonly sound: string;
   readonly bestFor: string;
   readonly variants: readonly StringVariant[];
 }
@@ -50,7 +49,6 @@ export const stringFamilies: readonly StringFamily[] = [
     ratings: { power: 3, control: 3, durability: 5 },
     gauge: '0,70 mm',
     feel: 'Zacht en vergevingsgezind',
-    sound: 'Dof en gedempt',
     bestFor: 'Beginners, clubspelers en wie een duurzame snaar zoekt',
     variants: [
       { id: 'bg-65-wit', colour: 'wit', priceCents: 450 },
@@ -64,7 +62,6 @@ export const stringFamilies: readonly StringFamily[] = [
     ratings: { power: 4, control: 4, durability: 2 },
     gauge: '0,68 mm',
     feel: 'Stevig en strak',
-    sound: 'Hoge, heldere "ping"',
     bestFor: 'Gevorderde spelers die controle en feedback willen',
     variants: [
       { id: 'bg-80-wit', colour: 'wit', priceCents: 600 },
@@ -78,7 +75,6 @@ export const stringFamilies: readonly StringFamily[] = [
     ratings: { power: 5, control: 3, durability: 3 },
     gauge: '0,68 mm',
     feel: 'Stevig, iets stugger en puncheriger',
-    sound: 'Scherp, iets luider en explosiever',
     bestFor: 'Smashers en aanvallende spelers die extra punch willen',
     variants: [{ id: 'bg-80-power-wit', colour: 'wit', priceCents: 600 }],
   },

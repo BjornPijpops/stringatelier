@@ -35,7 +35,6 @@ describe('stringFamilies', () => {
         family.tagline,
         family.gauge,
         family.feel,
-        family.sound,
         family.bestFor,
       ]) {
         expect(text.length).toBeGreaterThan(0);

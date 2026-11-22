@@ -8,35 +8,36 @@ interface Props {
 
 const { family } = Astro.props;
 const colours = family.variants.map((variant) => variant.colour).join(' of ');
+const labelClass = 'text-sm font-bold tracking-wider text-brand uppercase';
 ---
 
-<article class="flex flex-col rounded-2xl border border-line bg-surface p-5">
-  <h3 class="text-lg">{family.name}</h3>
-  <p class="mt-1 font-semibold">{family.tagline}</p>
+<!-- On wide screens the card spans the 5 shared grid rows so rows line up across cards. -->
+<article class="grid gap-y-4 rounded-2xl border border-line bg-surface p-5 md:row-span-5 md:grid-rows-subgrid">
+  <div>
+    <h3 class="text-lg">{family.name}</h3>
+    <p class="mt-1 font-semibold">{family.tagline}</p>
+  </div>
 
-  <div class="mt-4 space-y-2">
+  <div class="space-y-2">
     <RatingDots label="Kracht" value={family.ratings.power} />
     <RatingDots label="Controle" value={family.ratings.control} />
     <RatingDots label="Duurzaamheid" value={family.ratings.durability} />
   </div>
 
-  <dl class="mt-4 space-y-3 border-t border-line pt-4 text-sm">
+  <dl class="space-y-3 border-t border-line pt-4">
     <div>
-      <dt class="text-ink-soft">Gevoel</dt>
-      <dd>{family.feel}</dd>
+      <dt class={labelClass}>Gevoel</dt>
+      <dd class="mt-0.5">{family.feel}</dd>
     </div>
     <div>
-      <dt class="text-ink-soft">Geluid</dt>
-      <dd>{family.sound}</dd>
-    </div>
-    <div>
-      <dt class="text-ink-soft">Dikte</dt>
-      <dd>{family.gauge}</dd>
+      <dt class={labelClass}>Dikte</dt>
+      <dd class="mt-0.5">{family.gauge}</dd>
     </div>
   </dl>
 
-  <p class="mt-4 rounded-lg bg-surface-alt px-3 py-2 text-sm">
+  <p class="rounded-lg bg-surface-alt px-3 py-2 text-sm">
     <span class="font-semibold">Ideaal voor:</span> {family.bestFor}
   </p>
-  <p class="mt-3 text-sm text-ink-soft">Kleur: {colours}</p>
+
+  <p class="text-sm text-ink-soft">Kleur: {colours}</p>
 </article>
