@@ -48,3 +48,9 @@ docs/          architecture, ADRs, roadmap
 - `calculateTotal` (`src/lib/calculateTotal.ts`) is a pure, unit-tested function: `(service + string) x quantity`, or service only for own strings.
 - `PriceCalculator.astro` is a progressive enhancement: hidden by default and revealed by its script, so without JavaScript visitors still see the full price tables.
 - It reads the same `src/data/pricing.ts` data as the overview, so prices are only ever changed in one place.
+
+## Contact page
+
+- Contact details, location and handover slots live only in `src/data/contact.ts`; the page renders them.
+- `src/lib/phone.ts` formats Belgian numbers for display and builds international `tel:` links (tested).
+- No contact form: there is no backend (see ADR 0001). Email and phone are plain `mailto:`/`tel:` links.

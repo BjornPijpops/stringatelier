@@ -10,4 +10,5 @@ export const siteTagline = 'Badminton rackets professioneel besnaard';
 export const navItems: readonly NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Prijzen', href: '/prijzen' },
+  { label: 'Contact', href: '/contact' },
 ];
