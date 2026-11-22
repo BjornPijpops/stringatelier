@@ -1,0 +1,106 @@
+---
+import { stringOptions } from '../data/pricing';
+import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
+---
+
+<section
+  id="calculator"
+  class="mt-10 hidden rounded-2xl border-2 border-ink p-6 sm:p-8"
+  aria-labelledby="calculator-heading"
+>
+  <h2 id="calculator-heading" class="text-xl">
+    Bereken je prijs
+  </h2>
+  <form class="mt-5 grid gap-5 sm:grid-cols-2" novalidate>
+    <div>
+      <label for="calc-string" class="block text-sm font-semibold">
+        Snaar
+      </label>
+      <select
+        id="calc-string"
+        name="string"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2"
+      >
+        <option value={OWN_STRING_VALUE}>
+          Eigen snaar (alleen servicekosten)
+        </option>
+        {stringOptions.map((option) => (
+          <option value={option.id}>{option.name}</option>
+        ))}
+      </select>
+    </div>
+    <div>
+      <label for="calc-quantity" class="block text-sm font-semibold">
+        Aantal rackets
+      </label>
+      <input
+        id="calc-quantity"
+        name="quantity"
+        type="number"
+        min="1"
+        max={MAX_QUANTITY}
+        step="1"
+        value="1"
+        inputmode="numeric"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2"
+      />
+    </div>
+  </form>
+  <p
+    class="mt-6 text-sm text-ink-soft"
+    id="calc-breakdown"
+    aria-live="polite"
+  ></p>
+  <p class="mt-1 font-display text-4xl" id="calc-total" aria-live="polite"></p>
+</section>
+
+<script>
+  import { calculateTotal } from '../lib/calculateTotal';
+  import { formatMoney } from '../lib/formatMoney';
+  import { servicePriceCents, stringOptions } from '../data/pricing';
+  import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
+
+  const root = document.querySelector<HTMLElement>('#calculator');
+  const stringSelect = root?.querySelector<HTMLSelectElement>('#calc-string');
+  const quantityInput = root?.querySelector<HTMLInputElement>('#calc-quantity');
+  const breakdown = root?.querySelector<HTMLElement>('#calc-breakdown');
+  const total = root?.querySelector<HTMLElement>('#calc-total');
+
+  function parseQuantity(raw: string): number | null {
+    const value = Number(raw);
+    return Number.isInteger(value) && value >= 1 && value <= MAX_QUANTITY
+      ? value
+      : null;
+  }
+
+  function render() {
+    if (!stringSelect || !quantityInput || !breakdown || !total) return;
+
+    const quantity = parseQuantity(quantityInput.value);
+    if (quantity === null) {
+      breakdown.textContent = `Vul een aantal in tussen 1 en ${MAX_QUANTITY}.`;
+      total.textContent = '';
+      return;
+    }
+
+    const stringId =
+      stringSelect.value === OWN_STRING_VALUE ? null : stringSelect.value;
+    const quote = calculateTotal(
+      { stringId, quantity },
+      { servicePriceCents, stringOptions },
+    );
+
+    breakdown.textContent =
+      stringId === null
+        ? `Service: ${formatMoney(quote.serviceCents)}`
+        : `Service: ${formatMoney(quote.serviceCents)} + snaren: ${formatMoney(quote.stringsCents)}`;
+    total.textContent = formatMoney(quote.totalCents);
+  }
+
+  if (root) {
+    // Hidden without JavaScript: the price tables above stay the source of truth.
+    root.classList.remove('hidden');
+    root.addEventListener('input', render);
+    render();
+  }
+</script>

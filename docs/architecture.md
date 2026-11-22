@@ -42,3 +42,9 @@ docs/          architecture, ADRs, roadmap
 - Navigation comes from `navItems` in `src/data/site.ts`; a page feature adds its own entry.
 - Internal links always go through `withBase()` (`src/lib/withBase.ts`) so they work under the GitHub Pages `/stringatelier` base path.
 - Tokens live in `@theme` in `src/styles/global.css`: navy `ink` text, electric-lime `accent` (shuttlecock feel), bold uppercase display headings, system fonts (no external font requests, so the site stays fast).
+
+## Price calculator
+
+- `calculateTotal` (`src/lib/calculateTotal.ts`) is a pure, unit-tested function: `(service + string) x quantity`, or service only for own strings.
+- `PriceCalculator.astro` is a progressive enhancement: hidden by default and revealed by its script, so without JavaScript visitors still see the full price tables.
+- It reads the same `src/data/pricing.ts` data as the overview, so prices are only ever changed in one place.

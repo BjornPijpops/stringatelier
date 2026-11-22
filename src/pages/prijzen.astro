@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PriceTable from '../components/PriceTable.astro';
+import PriceCalculator from '../components/PriceCalculator.astro';
 import { formatMoney } from '../lib/formatMoney';
 import { servicePriceCents, stringOptions } from '../data/pricing';
 ---
@@ -37,4 +38,6 @@ import { servicePriceCents, stringOptions } from '../data/pricing';
     </p>
     <PriceTable options={stringOptions} />
   </section>
+
+  <PriceCalculator />
 </BaseLayout>
