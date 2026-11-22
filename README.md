@@ -11,14 +11,15 @@ npm run dev
 
 Stack: Astro, TypeScript (strict), Tailwind CSS, Vitest (see `docs/adr/0001-tech-stack.md`).
 
-| Script           | Purpose                             |
-| ---------------- | ----------------------------------- |
-| `npm run dev`    | Local dev server                    |
-| `npm run build`  | Production build to `dist/`         |
-| `npm run check`  | Astro/TypeScript type check         |
-| `npm test`       | Unit tests                          |
-| `npm run lint`   | ESLint                              |
-| `npm run format` | Prettier (`format:check` to verify) |
+| Script                | Purpose                             |
+| --------------------- | ----------------------------------- |
+| `npm run dev`         | Local dev server                    |
+| `npm run build`       | Production build to `dist/`         |
+| `npm run check`       | Astro/TypeScript type check         |
+| `npm test`            | Unit tests                          |
+| `npm run lint`        | ESLint                              |
+| `npm run screenshots` | Screenshots every page (visual QA)  |
+| `npm run format`      | Prettier (`format:check` to verify) |
 
 CI (`.github/workflows/ci.yml`) runs lint, format check, type check, tests and build on every push and PR.
 

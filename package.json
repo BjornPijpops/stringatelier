@@ -12,7 +12,8 @@
     "test": "vitest run",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "screenshots": "node scripts/screenshots.mjs"
   },
   "dependencies": {
     "astro": "^7.4.13"
@@ -23,6 +24,7 @@
     "@tailwindcss/vite": "^4.3.5",
     "eslint": "^10.15.0",
     "eslint-plugin-astro": "^3.2.1",
+    "playwright": "^1.65.1",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
     "tailwindcss": "^4.3.5",
