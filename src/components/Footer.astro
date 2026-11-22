@@ -10,14 +10,14 @@ const linkClass =
 
 <footer class="bg-ink text-white">
   <Container class="flex flex-col gap-2 py-4 text-sm sm:flex-row sm:items-center sm:justify-between">
-    <p class="text-white/80">
+    <p class="text-center text-white/80 sm:text-left">
       <span class="font-display tracking-tight text-white uppercase">
         {siteName}
       </span>
       {` · © ${year}`}
     </p>
-    <nav aria-label="Voetnavigatie">
-      <ul class="flex flex-wrap gap-x-4">
+    <nav aria-label="Voetnavigatie" class="w-full sm:w-auto">
+      <ul class="flex justify-between sm:justify-start sm:gap-x-4">
         {navItems.map((item) => (
           <li>
             <a class={linkClass} href={withBase(item.href)}>

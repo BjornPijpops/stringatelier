@@ -15,14 +15,14 @@ const isCurrent = (href: string) =>
       <Logo fallback class="h-10" />
       <span class="sr-only">{siteName} home</span>
     </a>
-    <nav aria-label="Hoofdnavigatie">
-      <ul class="flex gap-4 text-sm font-semibold sm:gap-4">
+    <nav aria-label="Hoofdnavigatie" class="w-full sm:w-auto">
+      <ul class="grid grid-cols-3 text-center text-sm font-semibold sm:flex sm:gap-4 sm:text-left">
         {navItems.map((item) => (
           <li>
             <a
               href={withBase(item.href)}
               aria-current={isCurrent(item.href) ? 'page' : undefined}
-              class="flex min-h-11 items-center border-b-2 border-transparent px-2 hover:border-brand aria-[current=page]:border-brand"
+              class="flex min-h-11 items-center justify-center border-b-2 border-transparent px-2 sm:justify-start hover:border-brand aria-[current=page]:border-brand"
             >
               {item.label}
             </a>
