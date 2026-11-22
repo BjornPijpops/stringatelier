@@ -57,5 +57,5 @@ docs/          architecture, ADRs, roadmap
 
 ## Mobile-first quality gate
 
-- Most visitors use a phone, before or after a session. `tests/e2e/mobile.spec.ts` (Playwright, runs in CI) checks every page at 320, 375 and 414px: no horizontal scroll, nothing outside the viewport, tap targets >= 44px, text >= 14px, form inputs >= 16px (prevents iOS zoom), working calculator, tap-to-call and mail links.
+- Most visitors use a phone, before or after a session. `tests/e2e/mobile.spec.ts` (Playwright, runs in CI) checks every page at 320, 375 and 414px: no horizontal scroll, nothing outside the viewport, tap targets >= 44x44px, text >= 14px, form inputs >= 16px (prevents iOS zoom), working calculator, tap-to-call and mail links.
 - New pages must be added to the `PAGES` list in that spec.

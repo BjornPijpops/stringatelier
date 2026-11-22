@@ -35,7 +35,9 @@ async function findSmallTapTargets(page: Page) {
             h: rect.height,
           };
         })
-        .filter((box) => box.w > 0 && box.h > 0 && box.h < min),
+        .filter(
+          (box) => box.w > 0 && box.h > 0 && (box.h < min || box.w < min),
+        ),
     MIN_TAP_TARGET_PX,
   );
 }
@@ -76,14 +78,17 @@ for (const phone of PHONES) {
             (elements, width) =>
               elements
                 .filter((el) => !el.closest('.sr-only, [aria-hidden="true"]'))
-                .filter((el) => el.getBoundingClientRect().right > width + 1)
+                .filter((el) => {
+                  const rect = el.getBoundingClientRect();
+                  return rect.left < -1 || rect.right > width + 1;
+                })
                 .map((el) => el.tagName.toLowerCase()),
             phone.width,
           );
           expect(offenders).toEqual([]);
         });
 
-        test('has tap targets of at least 44px high', async ({ page }) => {
+        test('has tap targets of at least 44x44px', async ({ page }) => {
           expect(await findSmallTapTargets(page)).toEqual([]);
         });
 
