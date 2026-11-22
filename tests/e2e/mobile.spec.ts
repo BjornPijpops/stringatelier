@@ -189,6 +189,11 @@ for (const phone of PHONES) {
         }
       });
 
+      test('shows each recommendation once', async ({ page }) => {
+        const text = await page.locator('article').first().innerText();
+        expect(text.match(/Beginners, clubspelers/g)).toHaveLength(1);
+      });
+
       test('rating dots are readable by screen readers', async ({ page }) => {
         await expect(
           page.locator('article').first().getByText('5 van 5'),
@@ -242,3 +247,18 @@ for (const phone of PHONES) {
     });
   });
 }
+
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('prijzen still lists the all-in prices', async ({ page }) => {
+    await page.goto('prijzen/');
+    await expect(page.locator('#calculator')).toBeHidden();
+    const list = page.locator('noscript li');
+    await expect(list).toHaveCount(5);
+    await expect(list.first()).toContainText('BG-65 wit');
+    await expect(list.first()).toContainText('16,50');
+    await expect(list.last()).toContainText('BG-80 Power wit');
+    await expect(list.last()).toContainText('18,00');
+  });
+});

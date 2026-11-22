@@ -52,4 +52,12 @@ describe('stringFamilies', () => {
       }
     }
   });
+
+  it('keeps the owner-supplied relationships between the strings', () => {
+    const [bg65, bg80, power] = stringFamilies.map((f) => f.ratings);
+    expect(bg65.durability).toBeGreaterThan(power.durability);
+    expect(power.durability).toBeGreaterThan(bg80.durability);
+    expect(power.power).toBeGreaterThan(bg80.power);
+    expect(bg80.power).toBeGreaterThan(bg65.power);
+  });
 });
