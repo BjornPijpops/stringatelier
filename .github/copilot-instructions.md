@@ -6,14 +6,14 @@ TypeScript website project. Quality bar: clean code, sensible design patterns, r
 
 Feature flow: **architect → ux-designer (UI work) → tech-lead → developer → qa → reviewer → user approval → merge to main**.
 
-| Agent       | Responsibility                                                      |
-| ----------- | ------------------------------------------------------------------- |
-| rchitect | Structure, tech choices, ADRs, patterns                             |
+| Agent         | Responsibility                                                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| rchitect      | Structure, tech choices, ADRs, patterns                                                                                           |
 | `ux-designer` | User journey, hierarchy, interaction patterns, visual balance; writes a design brief before UI work and reviews screenshots after |
-| `tech-lead` | Breaks features into tasks, owns branch/PR flow, enforces standards |
-| `developer` | Implements tasks, writes unit tests and docs                        |
-| `qa`        | Test strategy, edge cases, verifies acceptance criteria             |
-| `reviewer`  | Reviews ALL code before it is merged                                |
+| `tech-lead`   | Breaks features into tasks, owns branch/PR flow, enforces standards                                                               |
+| `developer`   | Implements tasks, writes unit tests and docs                                                                                      |
+| `qa`          | Test strategy, edge cases, verifies acceptance criteria                                                                           |
+| `reviewer`    | Reviews ALL code before it is merged                                                                                              |
 
 Skills live in `.github/skills`. Agents must load the skills listed in their definition.
 
