@@ -166,6 +166,23 @@ for (const phone of PHONES) {
       await expect(page.locator('a[href^="tel:+32"]')).toHaveCount(2);
     });
 
+    test('map loads on demand and fits the screen', async ({ page }) => {
+      await page.route('https://www.openstreetmap.org/**', (route) =>
+        route.fulfill({ contentType: 'text/html', body: '<p>map</p>' }),
+      );
+      await page.goto('contact/');
+      await expect(page.locator('iframe')).toHaveCount(0);
+      await page.getByRole('button', { name: 'Toon kaart' }).click();
+      const map = page.locator('iframe[title^="Kaart van"]');
+      await expect(map).toBeVisible();
+      const box = await map.boundingBox();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(phone.width);
+      await expect(
+        page.getByRole('link', { name: 'Route openen' }),
+      ).toHaveAttribute('href', /google\.com\/maps\/dir.*Ursulinenstraat/);
+    });
+
     test('navigation is reachable and the active page is marked', async ({
       page,
     }) => {

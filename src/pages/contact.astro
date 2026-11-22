@@ -1,11 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import {
-  contactEmail,
-  contactPeople,
-  handover,
-  location,
-} from '../data/contact';
+import LocationMap from '../components/LocationMap.astro';
+import { contactEmail, contactPeople, handover } from '../data/contact';
 import { formatBelgianPhone, toTelHref } from '../lib/phone';
 
 const linkClass =
@@ -67,9 +63,17 @@ const linkClass =
           </li>
         ))}
       </ul>
-      <p class="mt-4 text-sm text-ink-soft">
-        {handover.venue}, {location}
-      </p>
     </section>
   </div>
+
+  <section class="mt-10" aria-labelledby="map-heading">
+    <h2 id="map-heading" class="mb-4 text-xl">
+      Waar vind je ons?
+    </h2>
+    <LocationMap
+      venue={handover.venue}
+      address={handover.address}
+      coordinates={handover.coordinates}
+    />
+  </section>
 </BaseLayout>

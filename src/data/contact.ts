@@ -19,9 +19,11 @@ export const contactPeople: readonly ContactPerson[] = [
 export const location = 'Herk-de-Stad';
 
 export const handover = {
-  venue: 'Schubad',
+  venue: 'Sporthal Herkules',
+  address: 'Ursulinenstraat 1, 3540 Herk-de-Stad',
+  coordinates: { lat: 50.9429, lon: 5.1606 },
   description:
-    'Rackets geef je af en haal je op tijdens de trainingsuren van badmintonclub Schubad in Herk-de-Stad.',
+    'Rackets geef je af en haal je op tijdens de trainingsuren van badmintonclub Schubad in Sporthal Herkules.',
   slots: [
     { day: 'Dinsdag', time: '20u - 22u' },
     { day: 'Woensdag', time: '20u - 22u' },
