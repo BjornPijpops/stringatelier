@@ -29,10 +29,27 @@ describe('stringOptions', () => {
 });
 
 describe('stringFamilies', () => {
-  it('gives every family a summary and at least one variant', () => {
+  it('describes every family completely', () => {
     for (const family of stringFamilies) {
-      expect(family.summary.length).toBeGreaterThan(0);
+      for (const text of [
+        family.tagline,
+        family.gauge,
+        family.feel,
+        family.sound,
+        family.bestFor,
+      ]) {
+        expect(text.length).toBeGreaterThan(0);
+      }
       expect(family.variants.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('only uses ratings from 1 to 5', () => {
+    for (const family of stringFamilies) {
+      for (const rating of Object.values(family.ratings)) {
+        expect(rating).toBeGreaterThanOrEqual(1);
+        expect(rating).toBeLessThanOrEqual(5);
+      }
     }
   });
 });

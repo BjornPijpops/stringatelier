@@ -1,5 +1,6 @@
 ---
-import { stringFamilies } from '../data/pricing';
+import { servicePriceCents, stringFamilies } from '../data/pricing';
+import { formatMoney } from '../lib/formatMoney';
 import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
 
 const stepButton =
@@ -29,7 +30,8 @@ const stepButton =
           <optgroup label={family.name}>
             {family.variants.map((variant) => (
               <option value={variant.id}>
-                {family.name} {variant.colour}
+                {family.name} {variant.colour} ·{' '}
+                {formatMoney(servicePriceCents + variant.priceCents)}
               </option>
             ))}
           </optgroup>

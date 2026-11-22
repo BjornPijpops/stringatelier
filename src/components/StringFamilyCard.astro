@@ -1,58 +1,44 @@
 ---
-import { formatMoney } from '../lib/formatMoney';
-import type { Cents, StringFamily } from '../data/pricing';
+import RatingDots from './RatingDots.astro';
+import type { StringFamily } from '../data/pricing';
 
 interface Props {
   family: StringFamily;
-  servicePriceCents: Cents;
 }
 
-const { family, servicePriceCents } = Astro.props;
-
-/** Swatch colours for the string colours we sell. Unknown colours get no swatch. */
-const swatches: Record<string, string> = {
-  wit: 'bg-white border-ink-soft',
-  zwart: 'bg-ink border-ink',
-};
+const { family } = Astro.props;
+const colours = family.variants.map((variant) => variant.colour).join(' of ');
 ---
 
-<article class="flex flex-col rounded-2xl border border-line bg-surface p-5 transition hover:border-brand hover:shadow-md">
+<article class="flex flex-col rounded-2xl border border-line bg-surface p-5">
   <h3 class="text-lg">{family.name}</h3>
+  <p class="mt-1 font-semibold">{family.tagline}</p>
 
-  <details class="mt-1">
-    <summary class="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-brand [&::-webkit-details-marker]:hidden">
-      <span
-        aria-hidden="true"
-        class="grid size-6 place-items-center rounded-full bg-brand text-xs font-bold text-white"
-      >
-        ?
-      </span>
-      Wat is {family.name}?
-    </summary>
-    <p class="pb-2 text-ink-soft">{family.summary}</p>
-  </details>
+  <div class="mt-4 space-y-2">
+    <RatingDots label="Kracht" value={family.ratings.power} />
+    <RatingDots label="Controle" value={family.ratings.control} />
+    <RatingDots label="Duurzaamheid" value={family.ratings.durability} />
+  </div>
 
-  <ul class="mt-2 divide-y divide-line border-t border-line">
-    {family.variants.map((variant) => (
-      <li class="flex items-center justify-between gap-3 py-3">
-        <span class="flex items-center gap-2 font-semibold capitalize">
-          {swatches[variant.colour] && (
-            <span
-              aria-hidden="true"
-              class={`size-4 shrink-0 rounded-full border ${swatches[variant.colour]}`}
-            />
-          )}
-          {variant.colour}
-        </span>
-        <span class="text-right">
-          <span class="block font-display text-xl text-brand tabular-nums">
-            {formatMoney(servicePriceCents + variant.priceCents)}
-          </span>
-          <span class="block text-sm text-ink-soft tabular-nums">
-            {formatMoney(servicePriceCents)} + {formatMoney(variant.priceCents)}
-          </span>
-        </span>
-      </li>
-    ))}
-  </ul>
+  <dl class="mt-4 space-y-3 border-t border-line pt-4 text-sm">
+    <div>
+      <dt class="text-ink-soft">Gevoel</dt>
+      <dd>{family.feel}</dd>
+    </div>
+    <div>
+      <dt class="text-ink-soft">Geluid</dt>
+      <dd>{family.sound}</dd>
+    </div>
+    <div>
+      <dt class="text-ink-soft">Dikte</dt>
+      <dd>{family.gauge}</dd>
+    </div>
+  </dl>
+
+  <p class="mt-4 rounded-lg bg-surface-alt px-3 py-2 text-sm">
+    <span class="font-semibold">Ideaal voor: </span>
+    {family.bestFor}
+    {family.bestFor}
+  </p>
+  <p class="mt-3 text-sm text-ink-soft">Kleur: {colours}</p>
 </article>

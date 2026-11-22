@@ -64,8 +64,7 @@ docs/          architecture, ADRs, roadmap
 
 Decided with the `ux-designer` role, from the visitor's point of view (a player on a phone who wants their total price):
 
-- **Totals, not add-ons.** String cards show the all-in price per racket (service + string), with the sum underneath (EUR 12,00 + EUR 4,50). Visitors never have to add up prices themselves, and it matches the flyer.
-- **Tool first.** The calculator sits next to the EUR 12 service price at the top, in a brand-blue card. The reference cards follow below.
-- **Grouped by string type** (BG-65, BG-80, BG-80 Power) with colours as rows, because visitors choose a type first and a colour second. Data lives in `stringFamilies`; the flat `stringOptions` list for the calculator is derived from it.
-- **Progressive disclosure.** A native `<details>` "?" per type explains the string on tap, with no JavaScript needed and no hover-only content.
+- **Tool first.** The calculator sits next to the EUR 12 service price at the top, in a brand-blue card. It is where prices live: each dropdown option shows the all-in price per racket (service + string). Without JavaScript a `<noscript>` list shows the same prices.
+- **Explain, don't repeat.** The string section ("Welke snaar past bij jou?") has no prices. It helps visitors choose: one card per type (BG-65, BG-80, BG-80 Power) with a one-line character, 1-5 dot ratings for power, control and durability, feel, sound, thickness and a "best for" line. The ratings come from a comparison table supplied by the owner, translated to a 1-5 scale in `data/pricing.ts`. Dots are decorative; screen readers get "3 van 5" text (`RatingDots.astro`).
+- **Grouped by type.** Visitors choose a type first and a colour second, so colours are listed on the card, not as separate cards. The flat `stringOptions` list for the calculator is derived from `stringFamilies`.
 - **Next step.** The page ends with a call to action to the contact page.

@@ -175,24 +175,35 @@ for (const phone of PHONES) {
         await page.goto('prijzen/');
       });
 
-      test('show all-in prices grouped by string type', async ({ page }) => {
+      test('explain each string type without repeating prices', async ({
+        page,
+      }) => {
         await expect(page.locator('article h3')).toHaveText([
           'BG-65',
           'BG-80',
           'BG-80 Power',
         ]);
-        await expect(page.locator('article').first()).toContainText('16,50');
-        await expect(page.locator('article').nth(1)).toContainText('18,00');
+        for (const card of await page.locator('article').all()) {
+          await expect(card).toContainText('Ideaal voor');
+          await expect(card).not.toContainText('€');
+        }
       });
 
-      test('the ? explanation opens by tap and is hidden before', async ({
+      test('rating dots are readable by screen readers', async ({ page }) => {
+        await expect(
+          page.locator('article').first().getByText('5 van 5'),
+        ).toHaveCount(1);
+      });
+
+      test('the calculator dropdown shows all-in prices per string', async ({
         page,
       }) => {
-        const summary = page.getByText('Wat is BG-65?');
-        const answer = page.getByText(/veelgebruikte, duurzame snaar/);
-        await expect(answer).toBeHidden();
-        await summary.click();
-        await expect(answer).toBeVisible();
+        await expect(
+          page.locator('#calc-string option[value="bg-65-wit"]'),
+        ).toContainText('16,50');
+        await expect(
+          page.locator('#calc-string option[value="bg-80-power-wit"]'),
+        ).toContainText('18,00');
       });
     });
 
