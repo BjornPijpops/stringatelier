@@ -25,6 +25,11 @@ Skills live in `.github/skills`. Agents must load the skills listed in their def
 5. A feature is "done" only when: tests pass, build passes, QA signed off, reviewer approved.
 6. **Merging/pushing to `main` ALWAYS requires explicit user approval** (ask via ask_user). Never force-push, never bypass.
 
+## Private notes (never published)
+
+- Clarifying questions, answers, open questions and business details (e.g. contact info before it is published) go in `.private/` (git-ignored). Never put Q&A or unfinished notes in `docs/` or commit messages; `docs/` only holds final decisions and their reasoning.
+- Check `.private/questions.md` for earlier answers before asking the user again.
+
 ## Code standards
 
 - Follow the `clean-code-standards` skill. TypeScript `strict`, no `any` without justification.

@@ -12,13 +12,3 @@ Each item is one feature = one branch = one PR. After each feature the user appr
 | 6   | `feature/contact-page`        | `data/contact.ts`, `/contact` with email and phone as `mailto:`/`tel:` links                                                                                           | Links work on mobile; details in one place                         |
 
 Note: the Actions deploy workflow only runs on `main`, so merging feature 2 is what first publishes the site. Feature branches are verified by CI (build/test/lint) only.
-
-## Confirmed
-
-- The string price is added on top of the €12 service fee (confirmed by the user).
-
-## Open questions
-
-- Email address and phone number to publish.
-- Business details for the footer (names, location, opening/handover info)?
-- Logo or brand colors? (otherwise we pick a clean sporty palette)

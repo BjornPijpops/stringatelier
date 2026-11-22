@@ -13,3 +13,6 @@ yarn-error.log*
 
 /dist
 /.astro
+
+# Private notes, Q&A and business details; never committed
+/.private/

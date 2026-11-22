@@ -22,7 +22,7 @@ Option 3. One `/prijzen` page with:
 
 Both read from **one typed pricing data module** (`src/data/pricing.ts`). Calculation lives in a pure function (`src/lib/pricing/calculateTotal.ts`) with unit tests. No price is hard-coded in components.
 
-## Pricing rule (confirmed by the user)
+## Pricing rule
 
 `total per racket = service price (€12) + string price`; with own strings: `€12`. Quantity multiplies the total.
 
