@@ -42,6 +42,17 @@ async function findSmallTapTargets(page: Page) {
   );
 }
 
+/**
+ * Phones and CI runners ship different fonts. Verdana/DejaVu Sans are wide, so layouts that
+ * pass with them hold up on any device.
+ */
+async function useWideFont(page: Page) {
+  await page.addStyleTag({
+    content:
+      "* { font-family: Verdana, 'DejaVu Sans', sans-serif !important; }",
+  });
+}
+
 for (const phone of PHONES) {
   test.describe(`phone ${phone.name}px`, () => {
     test.use({
@@ -54,6 +65,7 @@ for (const phone of PHONES) {
       test.describe(name, () => {
         test.beforeEach(async ({ page }) => {
           await page.goto(path);
+          await useWideFont(page);
         });
 
         test('has a responsive viewport meta tag', async ({ page }) => {
