@@ -22,6 +22,10 @@ Stack: Astro, TypeScript (strict), Tailwind CSS, Vitest (see `docs/adr/0001-tech
 
 CI (`.github/workflows/ci.yml`) runs lint, format check, type check, tests and build on every push and PR.
 
+## Deployment
+
+The site is published at https://bjornpijpops.github.io/stringatelier/ through GitHub Pages. Every push to `main` triggers `.github/workflows/deploy.yml`, which builds the site and deploys `dist/`. This needs repository Settings → Pages → Source set to **GitHub Actions**. When adding internal links or assets, build them from `import.meta.env.BASE_URL` so they work under `/stringatelier`.
+
 ```
 
 ## AI team
