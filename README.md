@@ -32,8 +32,8 @@ The site is published at https://bjornpijpops.github.io/stringatelier/ through G
 
 ## AI team
 
-Agents (`.github/agents`): `architect`, `tech-lead`, `developer`, `qa`, `reviewer`.
-Skills (`.github/skills`): architecture-decision-records, design-patterns-guide, clean-code-standards, feature-planning, feature-branch-workflow, documentation-standards, reusable-components, testing-practices, qa-checklist, visual-qa, code-review-checklist.
+Agents (`.github/agents`): `architect`, `ux-designer`, `tech-lead`, `developer`, `qa`, `reviewer`.
+Skills (`.github/skills`): architecture-decision-records, design-patterns-guide, clean-code-standards, feature-planning, feature-branch-workflow, documentation-standards, reusable-components, testing-practices, qa-checklist, visual-qa, ux-design-principles, code-review-checklist.
 Global rules: `.github/copilot-instructions.md`.
 
 ## Workflow
