@@ -1,15 +1,17 @@
 ---
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteTagline } from '../data/site';
 ---
 
-<!doctype html>
-<html lang="nl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>StringAtelier</title>
-  </head>
-  <body class="grid min-h-screen place-items-center">
-    <h1 class="text-4xl font-bold">StringAtelier</h1>
-  </body>
-</html>
+<BaseLayout>
+  <section class="rounded-2xl bg-surface-alt px-6 py-14 sm:px-12 sm:py-20">
+    <p class="mb-4 inline-block rounded bg-accent px-2 py-1 text-xs font-bold tracking-widest uppercase">
+      Badminton restringing
+    </p>
+    <h1 class="max-w-2xl text-4xl sm:text-6xl">Snelle, scherpe besnaring</h1>
+    <p class="mt-6 max-w-xl text-lg text-ink-soft">
+      {siteTagline}. StringAtelier besnaart jouw badmintonracket met zorg, zodat
+      je klaar bent voor de volgende wedstrijd.
+    </p>
+  </section>
+</BaseLayout>

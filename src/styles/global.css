@@ -1,1 +1,35 @@
 @import 'tailwindcss';
+
+/* Design tokens: the single place for the brand look (clean, sporty). */
+@theme {
+  --color-ink: #0b1f3a;
+  --color-ink-soft: #3d4f66;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f2f6fa;
+  --color-line: #dbe3ec;
+  --color-accent: #c6f432;
+  --color-accent-strong: #a6d412;
+
+  --font-sans:
+    'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-display:
+    'Arial Black', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-surface font-sans text-ink antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight uppercase;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ink;
+  }
+}

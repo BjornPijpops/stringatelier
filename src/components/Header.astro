@@ -1,0 +1,36 @@
+---
+import Container from './Container.astro';
+import { navItems, siteName } from '../data/site';
+import { withBase } from '../lib/withBase';
+
+const currentPath = Astro.url.pathname.replace(/\/+$/, '');
+const isCurrent = (href: string) =>
+  withBase(href).replace(/\/+$/, '') === currentPath;
+---
+
+<header class="border-b border-line bg-surface">
+  <Container class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-4">
+    <a
+      href={withBase('/')}
+      class="font-display text-xl tracking-tight uppercase"
+    >
+      String<span class="rounded bg-accent px-1.5">Atelier</span>
+      <span class="sr-only">{siteName} home</span>
+    </a>
+    <nav aria-label="Hoofdnavigatie">
+      <ul class="flex gap-6 text-sm font-semibold">
+        {navItems.map((item) => (
+          <li>
+            <a
+              href={withBase(item.href)}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+              class="border-b-2 border-transparent py-1 hover:border-accent-strong aria-[current=page]:border-ink"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </Container>
+</header>
