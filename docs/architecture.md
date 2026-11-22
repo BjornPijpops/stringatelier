@@ -3,6 +3,7 @@
 See `docs/adr/` for the reasoning behind each decision.
 
 ## Overview
+
 Static Astro site (TypeScript, Tailwind) deployed to GitHub Pages. Pages: Home, Prices (`/prijzen`), Contact (`/contact`).
 
 ```mermaid
@@ -15,6 +16,7 @@ flowchart LR
 ```
 
 ## Structure
+
 ```
 src/
   data/        single source of truth (pricing.ts, contact.ts)
@@ -27,6 +29,7 @@ docs/          architecture, ADRs, roadmap
 ```
 
 ## Conventions
+
 - Content/prices/contact details only in `src/data`, never inside components.
 - Money as integer cents; formatting via one helper (`nl-NL`, EUR).
 - Logic in `lib` has no DOM/framework dependencies and is unit tested.

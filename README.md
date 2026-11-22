@@ -3,20 +3,40 @@
 TypeScript website project, built by an AI team with a strict quality workflow.
 
 ## Setup
+
 ```
 npm install
-npm run build
+npm run dev
+```
+
+Stack: Astro, TypeScript (strict), Tailwind CSS, Vitest (see `docs/adr/0001-tech-stack.md`).
+
+| Script           | Purpose                             |
+| ---------------- | ----------------------------------- |
+| `npm run dev`    | Local dev server                    |
+| `npm run build`  | Production build to `dist/`         |
+| `npm run check`  | Astro/TypeScript type check         |
+| `npm test`       | Unit tests                          |
+| `npm run lint`   | ESLint                              |
+| `npm run format` | Prettier (`format:check` to verify) |
+
+CI (`.github/workflows/ci.yml`) runs lint, format check, type check, tests and build on every push and PR.
+
 ```
 
 ## AI team
+
 Agents (`.github/agents`): `architect`, `tech-lead`, `developer`, `qa`, `reviewer`.
 Skills (`.github/skills`): architecture-decision-records, design-patterns-guide, clean-code-standards, feature-planning, feature-branch-workflow, documentation-standards, reusable-components, testing-practices, qa-checklist, code-review-checklist.
 Global rules: `.github/copilot-instructions.md`.
 
 ## Workflow
+
 One `feature/<name>` branch per feature → QA → review → PR → **user approval** → merge to `main`.
 Nothing is pushed to `main` without explicit approval.
 
 ## Docs
+
 - `docs/architecture.md` (to be created by the architect)
 - `docs/adr/` – architecture decision records
+```

@@ -1,14 +1,33 @@
 {
   "name": "stringatelier",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
+  "description": "Website of StringAtelier, badminton racket stringing",
+  "type": "module",
+  "private": true,
   "scripts": {
-    "build": "tsc"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
-  "dependencies": {},
+  "dependencies": {
+    "astro": "^7.4.13"
+  },
   "devDependencies": {
-    "typescript": "^6.0.3"
-  },
-  "private": true
+    "@astrojs/check": "^0.9.12",
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.5",
+    "eslint": "^10.15.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "prettier": "^3.10.1",
+    "prettier-plugin-astro": "^1.1.2",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.73.0",
+    "vitest": "^5.1.1"
+  }
 }
