@@ -4,7 +4,7 @@ import { mkdir, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, relative, sep } from 'node:path';
 import { preview } from 'astro';
-import { chromium } from 'playwright';
+import { chromium } from '@playwright/test';
 
 const VIEWPORTS = [
   { name: 'mobile-320', width: 320, height: 640 },

@@ -54,3 +54,8 @@ docs/          architecture, ADRs, roadmap
 - Contact details, location and handover slots live only in `src/data/contact.ts`; the page renders them.
 - `src/lib/phone.ts` formats Belgian numbers for display and builds international `tel:` links (tested).
 - No contact form: there is no backend (see ADR 0001). Email and phone are plain `mailto:`/`tel:` links.
+
+## Mobile-first quality gate
+
+- Most visitors use a phone, before or after a session. `tests/e2e/mobile.spec.ts` (Playwright, runs in CI) checks every page at 320, 375 and 414px: no horizontal scroll, nothing outside the viewport, tap targets >= 44px, text >= 14px, form inputs >= 16px (prevents iOS zoom), working calculator, tap-to-call and mail links.
+- New pages must be added to the `PAGES` list in that spec.

@@ -16,3 +16,6 @@ yarn-error.log*
 
 # Private notes, Q&A and business details; never committed
 /.private/
+
+/test-results
+/playwright-report

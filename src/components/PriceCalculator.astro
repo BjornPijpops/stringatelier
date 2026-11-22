@@ -19,15 +19,16 @@ import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
       <select
         id="calc-string"
         name="string"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2"
+        class="mt-1 min-h-11 w-full rounded-lg border border-line bg-surface px-3 py-2 text-base"
       >
-        <option value={OWN_STRING_VALUE}>
-          Eigen snaar (alleen servicekosten)
-        </option>
+        <option value={OWN_STRING_VALUE}>Eigen snaar</option>
         {stringOptions.map((option) => (
           <option value={option.id}>{option.name}</option>
         ))}
       </select>
+      <p class="mt-1 text-sm text-ink-soft">
+        Eigen snaar: je betaalt alleen de servicekosten.
+      </p>
     </div>
     <div>
       <label for="calc-quantity" class="block text-sm font-semibold">
@@ -42,7 +43,7 @@ import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
         step="1"
         value="1"
         inputmode="numeric"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2"
+        class="mt-1 min-h-11 w-full rounded-lg border border-line bg-surface px-3 py-2 text-base"
       />
     </div>
   </form>
