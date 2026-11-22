@@ -34,14 +34,14 @@ docs/          architecture, ADRs, roadmap
 - Money as integer cents; formatting via one helper (`nl-NL`, EUR).
 - Logic in `lib` has no DOM/framework dependencies and is unit tested.
 - Components are small, typed (`Props` interface), accessible and mobile-first.
-- Design tokens (colors, spacing, fonts) live in the Tailwind theme only. Look: clean, white space, energetic accent color, bold sporty headings.
+- Design tokens (colors, spacing, fonts) live in the Tailwind theme only. Look: clean, white space, club-blue brand color, bold sporty headings.
 
 ## Layout and design tokens
 
 - `BaseLayout` wraps every page (SEO head, skip link, `Header`, `Footer`, `Container`). Pass `title` and `description` per page.
 - Navigation comes from `navItems` in `src/data/site.ts`; a page feature adds its own entry.
 - Internal links always go through `withBase()` (`src/lib/withBase.ts`) so they work under the GitHub Pages `/stringatelier` base path.
-- Tokens live in `@theme` in `src/styles/global.css`: navy `ink` text, electric-lime `accent` (shuttlecock feel), bold uppercase display headings, system fonts (no external font requests, so the site stays fast).
+- Tokens live in `@theme` in `src/styles/global.css`: navy `ink` text, royal-blue `brand` (`brand-strong`, `brand-soft`) taken from the flyer and matching the colours of badminton club Schubad, bold uppercase display headings in brand blue, system fonts (no external font requests, so the site stays fast). Text on a `brand` background is always white. To rebrand, change the tokens only.
 
 ## Price calculator
 

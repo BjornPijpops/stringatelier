@@ -4,7 +4,7 @@ export interface NavItem {
 }
 
 export const siteName = 'StringAtelier';
-export const siteTagline = 'Badminton rackets professioneel besnaard';
+export const siteTagline = 'Met precisie bespannen.';
 
 /** Main navigation. Each page feature adds its own entry here. */
 export const navItems: readonly NavItem[] = [

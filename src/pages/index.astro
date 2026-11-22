@@ -4,14 +4,21 @@ import { siteTagline } from '../data/site';
 ---
 
 <BaseLayout>
-  <section class="rounded-2xl bg-surface-alt px-6 py-14 sm:px-12 sm:py-20">
-    <p class="mb-4 inline-block rounded bg-accent px-2 py-1 text-xs font-bold tracking-widest uppercase">
-      Badminton restringing
-    </p>
-    <h1 class="max-w-2xl text-4xl sm:text-6xl">Snelle, scherpe besnaring</h1>
-    <p class="mt-6 max-w-xl text-lg text-ink-soft">
-      {siteTagline}. StringAtelier besnaart jouw badmintonracket met zorg, zodat
-      je klaar bent voor de volgende wedstrijd.
-    </p>
+  <section class="relative overflow-hidden rounded-2xl bg-surface-alt px-6 py-14 sm:px-12 sm:py-20">
+    <div
+      aria-hidden="true"
+      class="absolute -top-24 -right-24 size-72 rounded-full bg-brand-soft sm:size-96"
+    ></div>
+    <div class="relative">
+      <p class="mb-4 inline-block rounded bg-brand px-2 py-1 text-xs font-bold tracking-widest text-white uppercase">
+        Badminton restringing
+      </p>
+      <h1 class="max-w-2xl text-4xl sm:text-6xl">{siteTagline}</h1>
+      <p class="mt-6 max-w-xl text-lg text-ink-soft">
+        Is je racket toe aan nieuwe snaren? Wij geven het de spanning die het
+        verdient: snel en met oog voor detail. Breng je racket binnen bij de
+        club en speel binnen enkele dagen weer met volle power!
+      </p>
+    </div>
   </section>
 </BaseLayout>

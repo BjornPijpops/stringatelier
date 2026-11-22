@@ -14,7 +14,7 @@ const isCurrent = (href: string) =>
       href={withBase('/')}
       class="font-display text-xl tracking-tight uppercase"
     >
-      String<span class="rounded bg-accent px-1.5">Atelier</span>
+      String<span class="rounded bg-brand px-1.5 text-white">Atelier</span>
       <span class="sr-only">{siteName} home</span>
     </a>
     <nav aria-label="Hoofdnavigatie">
@@ -24,7 +24,7 @@ const isCurrent = (href: string) =>
             <a
               href={withBase(item.href)}
               aria-current={isCurrent(item.href) ? 'page' : undefined}
-              class="border-b-2 border-transparent py-1 hover:border-accent-strong aria-[current=page]:border-ink"
+              class="border-b-2 border-transparent py-1 hover:border-brand aria-[current=page]:border-ink"
             >
               {item.label}
             </a>

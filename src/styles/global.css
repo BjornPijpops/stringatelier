@@ -5,10 +5,12 @@
   --color-ink: #0b1f3a;
   --color-ink-soft: #3d4f66;
   --color-surface: #ffffff;
-  --color-surface-alt: #f2f6fa;
-  --color-line: #dbe3ec;
-  --color-accent: #c6f432;
-  --color-accent-strong: #a6d412;
+  --color-surface-alt: #eaf0fa;
+  --color-line: #d3ddee;
+  /* Brand blue taken from the flyer (and the Schubad club colours). */
+  --color-brand: #0a4fb3;
+  --color-brand-strong: #083d8a;
+  --color-brand-soft: #cfdaee;
 
   --font-sans:
     'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial,
@@ -27,7 +29,7 @@
   h1,
   h2,
   h3 {
-    @apply font-display tracking-tight uppercase;
+    @apply font-display tracking-tight text-brand uppercase;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ink;
