@@ -22,7 +22,7 @@ Skills live in `.github/skills`. Agents must load the skills listed in their def
 2. Every feature gets its own branch from an up-to-date `main`: `feature/<short-kebab-name>` (fixes: `fix/…`, chores: `chore/…`, docs: `docs/…`).
 3. Small, focused commits using Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`).
 4. Push the feature branch freely; open a PR into `main`.
-5. A feature is "done" only when: tests pass, build passes, QA signed off, reviewer approved.
+5. A feature is "done" only when: tests pass, build passes, QA signed off (with visual evidence for UI changes, see `visual-qa`), reviewer approved.
 6. **Merging/pushing to `main` ALWAYS requires explicit user approval** (ask via ask_user). Never force-push, never bypass.
 7. After a merge, **keep the feature branch** until the user has checked the live result. Delete the finished branch (local and remote) only when the user gives the go to start the next feature. Never delete it earlier.
 

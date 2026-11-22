@@ -5,7 +5,7 @@ import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
 
 <section
   id="calculator"
-  class="mt-10 hidden rounded-2xl border-2 border-ink p-6 sm:p-8"
+  class="mt-10 hidden rounded-2xl border-2 border-brand p-6 sm:p-8"
   aria-labelledby="calculator-heading"
 >
   <h2 id="calculator-heading" class="text-xl">
@@ -51,7 +51,11 @@ import { MAX_QUANTITY, OWN_STRING_VALUE } from '../lib/calculatorConfig';
     id="calc-breakdown"
     aria-live="polite"
   ></p>
-  <p class="mt-1 font-display text-4xl" id="calc-total" aria-live="polite"></p>
+  <p
+    class="mt-1 font-display text-4xl text-brand"
+    id="calc-total"
+    aria-live="polite"
+  ></p>
 </section>
 
 <script>
