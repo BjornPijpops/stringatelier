@@ -13,14 +13,14 @@ const { venue, address, coordinates } = Astro.props;
 
 <div class="overflow-hidden rounded-2xl border border-line bg-surface">
   <div
-    id="map-frame"
+    data-map-frame
     class="grid h-64 place-items-center bg-brand-soft p-4 sm:h-80"
     data-src={osmEmbedUrl(coordinates)}
     data-title={`Kaart van ${venue}`}
   >
     <button
       type="button"
-      id="map-load"
+      data-map-load
       class="inline-flex min-h-11 items-center rounded-full bg-brand px-6 font-semibold text-white hover:bg-brand-strong"
     >
       Toon kaart
@@ -45,17 +45,19 @@ const { venue, address, coordinates } = Astro.props;
 
 <script>
   // The map loads on demand: no third-party requests until the visitor asks for it.
-  const frame = document.querySelector<HTMLElement>('#map-frame');
-  const button = document.querySelector<HTMLButtonElement>('#map-load');
-
-  button?.addEventListener('click', () => {
-    if (!frame?.dataset.src) return;
-    const iframe = document.createElement('iframe');
-    iframe.src = frame.dataset.src;
-    iframe.title = frame.dataset.title ?? 'Kaart';
-    iframe.loading = 'lazy';
-    iframe.className = 'h-full w-full border-0';
-    frame.replaceChildren(iframe);
-    frame.classList.remove('grid', 'place-items-center', 'p-4');
-  });
+  document
+    .querySelectorAll<HTMLElement>('[data-map-frame]')
+    .forEach((frame) => {
+      const button = frame.querySelector<HTMLButtonElement>('[data-map-load]');
+      button?.addEventListener('click', () => {
+        if (!frame.dataset.src) return;
+        const iframe = document.createElement('iframe');
+        iframe.src = frame.dataset.src;
+        iframe.title = frame.dataset.title ?? 'Kaart';
+        iframe.loading = 'lazy';
+        iframe.className = 'h-full w-full border-0';
+        frame.replaceChildren(iframe);
+        frame.classList.remove('grid', 'place-items-center', 'p-4');
+      });
+    });
 </script>
