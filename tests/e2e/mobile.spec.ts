@@ -212,12 +212,21 @@ for (const phone of PHONES) {
       });
     });
 
-    test('contact links are tappable mailto and tel links', async ({
+    test('contact offers mail plus a call and a WhatsApp button per person', async ({
       page,
     }) => {
       await page.goto('contact/');
       await expect(page.locator('main a[href^="mailto:"]')).toHaveCount(1);
       await expect(page.locator('main a[href^="tel:+32"]')).toHaveCount(2);
+      await expect(
+        page.locator('main a[href^="https://wa.me/32"]'),
+      ).toHaveCount(2);
+      await expect(
+        page.getByRole('link', { name: 'WhatsApp Bjorn' }),
+      ).toHaveAttribute('href', 'https://wa.me/32477191385');
+      await expect(
+        page.getByRole('link', { name: 'Bel Neal' }),
+      ).toHaveAttribute('href', 'tel:+32470630288');
     });
 
     test('home gives clear next steps and the key facts', async ({ page }) => {
