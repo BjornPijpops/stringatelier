@@ -3,8 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Section from '../components/Section.astro';
 import LocationMap from '../components/LocationMap.astro';
+import ButtonLink from '../components/ButtonLink.astro';
 import { contactEmail, contactPeople, handover } from '../data/contact';
-import { formatBelgianPhone, toTelHref } from '../lib/phone';
+import { formatBelgianPhone, toTelHref, toWhatsAppHref } from '../lib/phone';
 
 const linkClass =
   'inline-flex min-h-11 max-w-full items-center font-semibold wrap-anywhere underline text-brand decoration-brand-soft decoration-2 underline-offset-4';
@@ -39,11 +40,20 @@ const linkClass =
           </div>
           {contactPeople.map((person) => (
             <div>
-              <dt class="text-sm text-ink-soft">{person.name}</dt>
-              <dd>
-                <a class={linkClass} href={toTelHref(person.phone)}>
-                  {formatBelgianPhone(person.phone)}
-                </a>
+              <dt class="text-sm text-ink-soft">
+                {person.name} · {formatBelgianPhone(person.phone)}
+              </dt>
+              <dd class="mt-1 flex flex-wrap gap-2">
+                <ButtonLink href={toTelHref(person.phone)}>
+                  Bel {person.name}
+                </ButtonLink>
+                <ButtonLink
+                  href={toWhatsAppHref(person.phone)}
+                  variant="secondary"
+                  external
+                >
+                  WhatsApp {person.name}
+                </ButtonLink>
               </dd>
             </div>
           ))}

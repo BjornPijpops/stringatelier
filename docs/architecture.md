@@ -52,12 +52,12 @@ docs/          architecture, ADRs, roadmap
 ## Contact page
 
 - Contact details, location and handover slots live only in `src/data/contact.ts`; the page renders them.
-- `src/lib/phone.ts` formats Belgian numbers for display and builds international `tel:` links (tested).
-- No contact form: there is no backend (see ADR 0001). Email and phone are plain `mailto:`/`tel:` links.
+- `src/lib/phone.ts` formats Belgian numbers for display and builds international `tel:` and WhatsApp (`wa.me`) links (tested).
+- No contact form: there is no backend (see ADR 0001). Email is a `mailto:` link; each person has a "Bel" (`tel:`) and a "WhatsApp" button, so visitors with a question can message instead of calling.
 
 ## Mobile-first quality gate
 
-- Most visitors use a phone, before or after a session. `tests/e2e/mobile.spec.ts` (Playwright, runs in CI) checks every page at 320, 375 and 414px: no horizontal scroll, nothing outside the viewport, tap targets >= 44x44px, text >= 14px, form inputs >= 16px (prevents iOS zoom), working calculator, tap-to-call and mail links.
+- Most visitors use a phone, before or after a session. `tests/e2e/mobile.spec.ts` (Playwright, runs in CI) checks every page at 320, 375 and 414px: no horizontal scroll, nothing outside the viewport, tap targets >= 44x44px, text >= 14px, form inputs >= 16px (prevents iOS zoom), working calculator, call, WhatsApp and mail links.
 - New pages must be added to the `PAGES` list in that spec.
 
 ## Prices page design (UX)
