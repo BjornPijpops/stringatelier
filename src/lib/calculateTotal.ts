@@ -44,6 +44,39 @@ export function calculateTotal(
   };
 }
 
+export interface OrderQuote {
+  /** One quote per requested line, in the same order. */
+  readonly lines: readonly Quote[];
+  readonly serviceCents: Cents;
+  readonly stringsCents: Cents;
+  readonly totalCents: Cents;
+}
+
+/**
+ * Calculates the cost of an order that combines several string types,
+ * e.g. 2 rackets with BG-65 and 1 racket with the customer's own string.
+ * @throws if any line is invalid (see {@link calculateTotal}) or the order is empty.
+ */
+export function calculateOrder(
+  requests: readonly QuoteRequest[],
+  pricing: PricingData,
+): OrderQuote {
+  if (requests.length === 0) {
+    throw new Error('An order needs at least one line');
+  }
+
+  const lines = requests.map((request) => calculateTotal(request, pricing));
+  const sum = (pick: (quote: Quote) => Cents): Cents =>
+    lines.reduce((total, quote) => total + pick(quote), 0);
+
+  return {
+    lines,
+    serviceCents: sum((quote) => quote.serviceCents),
+    stringsCents: sum((quote) => quote.stringsCents),
+    totalCents: sum((quote) => quote.totalCents),
+  };
+}
+
 function findStringPrice(
   stringId: string,
   options: readonly StringOption[],

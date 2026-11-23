@@ -129,11 +129,14 @@ for (const phone of PHONES) {
       test('uses input text of at least 16px so iOS does not zoom', async ({
         page,
       }) => {
-        for (const selector of ['#calc-string', '#calc-quantity']) {
-          const size = await page
-            .locator(selector)
-            .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-          expect(size, selector).toBeGreaterThanOrEqual(MIN_INPUT_TEXT_PX);
+        await page.locator('#calc-add').click();
+        for (const selector of ['[data-string]', '[data-quantity]']) {
+          for (const field of await page.locator(selector).all()) {
+            const size = await field.evaluate((el) =>
+              parseFloat(getComputedStyle(el).fontSize),
+            );
+            expect(size, selector).toBeGreaterThanOrEqual(MIN_INPUT_TEXT_PX);
+          }
         }
       });
 
@@ -142,24 +145,54 @@ for (const phone of PHONES) {
       }) => {
         await expect(page.locator('#calc-total')).toContainText('12,00');
 
-        await page.locator('#calc-string').selectOption('bg-80-wit');
-        await page.locator('#calc-quantity').fill('2');
+        await page.locator('[data-string]').selectOption('bg-80-wit');
+        await page.locator('[data-quantity]').fill('2');
         await expect(page.locator('#calc-total')).toContainText('36,00');
+      });
+
+      test('combines different strings in one total', async ({ page }) => {
+        await page.locator('[data-string]').selectOption('bg-65-wit');
+        await page.locator('[data-quantity]').fill('2');
+        await page.locator('#calc-add').click();
+        await page.locator('[data-string]').nth(1).selectOption('bg-80-zwart');
+        await page.locator('#calc-add').click();
+
+        await expect(page.locator('[data-line]')).toHaveCount(3);
+        await expect(page.locator('#calc-breakdown li')).toHaveText([
+          /2 × BG-65 wit.*33,00/,
+          /1 × BG-80 zwart.*18,00/,
+          /1 × eigen snaar.*12,00/,
+        ]);
+        await expect(page.locator('#calc-total')).toContainText('63,00');
+      });
+
+      test('removes a line again and keeps at least one', async ({ page }) => {
+        await expect(page.locator('[data-remove]:visible')).toHaveCount(0);
+
+        await page.locator('#calc-add').click();
+        await page.locator('[data-string]').nth(1).selectOption('bg-80-wit');
+        await expect(page.locator('#calc-total')).toContainText('30,00');
+
+        await page.locator('[data-remove]').first().click();
+        await expect(page.locator('[data-line]')).toHaveCount(1);
+        await expect(page.locator('#calc-total')).toContainText('18,00');
+        await expect(page.locator('[data-remove]:visible')).toHaveCount(0);
       });
 
       test('asks for a valid quantity instead of showing a wrong total', async ({
         page,
       }) => {
-        await page.locator('#calc-quantity').fill('0');
+        await page.locator('[data-quantity]').fill('0');
         await expect(page.locator('#calc-total')).toBeEmpty();
         await expect(page.locator('#calc-breakdown')).toContainText(
           'tussen 1 en',
         );
       });
+
       test('stepper buttons change the quantity within its limits', async ({
         page,
       }) => {
-        const quantity = page.locator('#calc-quantity');
+        const quantity = page.locator('[data-quantity]');
         await page.getByRole('button', { name: 'Eén racket meer' }).click();
         await expect(quantity).toHaveValue('2');
         await expect(page.locator('#calc-total')).toContainText('24,00');
@@ -169,7 +202,6 @@ for (const phone of PHONES) {
         await expect(quantity).toHaveValue('1');
       });
     });
-
     test.describe('prijzen string cards', () => {
       test.beforeEach(async ({ page }) => {
         await page.goto('prijzen/');
@@ -204,10 +236,10 @@ for (const phone of PHONES) {
         page,
       }) => {
         await expect(
-          page.locator('#calc-string option[value="bg-65-wit"]'),
+          page.locator('[data-string] option[value="bg-65-wit"]'),
         ).toContainText('16,50');
         await expect(
-          page.locator('#calc-string option[value="bg-80-power-wit"]'),
+          page.locator('[data-string] option[value="bg-80-power-wit"]'),
         ).toContainText('18,00');
       });
     });
