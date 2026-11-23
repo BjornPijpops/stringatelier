@@ -5,7 +5,7 @@ import Section from '../components/Section.astro';
 import CtaBand from '../components/CtaBand.astro';
 import PriceCalculator from '../components/PriceCalculator.astro';
 import StringFamilyCard from '../components/StringFamilyCard.astro';
-import { formatMoney } from '../lib/formatMoney';
+import { formatMoney, formatWholeEuros } from '../lib/formatMoney';
 import { withBase } from '../lib/withBase';
 import {
   servicePriceCents,
@@ -18,10 +18,14 @@ import {
   title="Prijzen"
   description="Bekijk de prijzen voor het besnaren van je badmintonracket: €12 per racket, plus de snaar naar keuze."
 >
-  <PageHeader
-    title="Prijzen"
-    intro="Eén vast tarief per racket, plus de snaar die bij je past. Of breng je eigen snaar mee."
-  />
+  <PageHeader title="Prijzen">
+    <Fragment slot="intro">
+      Besnaren kost{' '}
+      <strong class="text-brand">{formatWholeEuros(servicePriceCents)}</strong>
+      per racket, plus de snaar die je kiest. Eigen snaar? Dan betaal je alleen
+      die {formatWholeEuros(servicePriceCents)}.
+    </Fragment>
+  </PageHeader>
 
   <Section aria-label="Prijs en rekenhulp">
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start md:has-[#calculator.hidden]:grid-cols-1 [&>*]:min-w-0">
