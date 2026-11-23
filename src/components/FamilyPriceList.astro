@@ -15,12 +15,16 @@ const isSingle = groups.length === 1;
 {isSingle && single && (
   <div>
     <p class="flex flex-wrap items-baseline gap-x-2">
-      <span class="font-display text-3xl text-brand tabular-nums">{formatMoney(single.totalCents)}</span>
+      <span class="font-display text-3xl text-brand tabular-nums">
+        {formatMoney(single.totalCents)}
+      </span>
       <span class="text-sm text-ink-soft">per racket</span>
     </p>
     <p class="mt-1 flex items-center gap-2 text-sm text-ink-soft">
       <span class="flex gap-1">
-        {single.colours.map((colour) => <ColourDot {colour} />)}
+        {single.colours.map((colour) => (
+          <ColourDot {colour} />
+        ))}
       </span>
       {single.colours.join(', ')}
     </p>
@@ -34,12 +38,15 @@ const isSingle = groups.length === 1;
         <li class="flex items-baseline justify-between gap-2">
           <span class="flex items-center gap-2 text-sm">
             <span class="flex gap-1">
-              {group.colours.map((colour) => <ColourDot {colour} />)}
+              {group.colours.map((colour) => (
+                <ColourDot {colour} />
+              ))}
             </span>
             {group.colours.join(', ')}
           </span>
           <span class="text-right font-display text-xl text-brand tabular-nums">
-            <span class="sr-only">per racket </span>{formatMoney(group.totalCents)}
+            <span class="sr-only">per racket </span>
+            {formatMoney(group.totalCents)}
           </span>
         </li>
       ))}

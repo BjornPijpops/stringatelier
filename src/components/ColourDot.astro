@@ -14,4 +14,7 @@ const { colour } = Astro.props;
 const fill = COLOUR_CLASSES[colour] ?? FALLBACK_CLASS;
 ---
 
-<span aria-hidden="true" class={`inline-block size-3 shrink-0 rounded-full border border-ink-soft ${fill}`}></span>
+<span
+  aria-hidden="true"
+  class={`inline-block size-3 shrink-0 rounded-full border border-ink-soft ${fill}`}
+></span>
