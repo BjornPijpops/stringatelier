@@ -1,0 +1,25 @@
+---
+import { colourDotFill } from '../lib/colourDots';
+
+interface Props {
+  colours: string[];
+}
+
+const { colours } = Astro.props;
+const dotFills = colours
+  .map(colourDotFill)
+  .filter((fill) => fill !== undefined);
+---
+
+<span class="flex items-center gap-2">
+  {dotFills.length > 0 && (
+    <span class="flex gap-1" aria-hidden="true">
+      {dotFills.map((fill) => (
+        <span
+          class={`inline-block size-3 shrink-0 rounded-full border border-ink-soft ${fill}`}
+        />
+      ))}
+    </span>
+  )}
+  <span>{colours.join(', ')}</span>
+</span>

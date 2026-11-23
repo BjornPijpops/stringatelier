@@ -410,7 +410,7 @@ for (const phone of PHONES) {
     }) => {
       await page.goto('prijzen/');
       await expect(page.locator('#service-price')).toHaveCount(0);
-      const intro = page.locator('main p').first();
+      const intro = page.getByTestId('page-intro');
       await expect(intro).toContainText(
         'Besnaren kost € 12 per racket, plus de snaar die je kiest. Eigen snaar? Dan betaal je alleen die € 12.',
       );
@@ -615,7 +615,7 @@ for (const width of [1280, 1920]) {
 
     test('intro and lead paragraph each fit on one line', async ({ page }) => {
       await page.goto('prijzen/');
-      const intro = page.locator('main p').first();
+      const intro = page.getByTestId('page-intro');
       const lead = page.locator('#strings-heading + p');
 
       expect(await isSingleLine(intro)).toBe(true);
