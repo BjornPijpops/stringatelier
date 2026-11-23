@@ -1,0 +1,17 @@
+---
+interface Props {
+  /** Colour name as used in the data, e.g. "wit". Unknown colours get a neutral dot. */
+  colour: string;
+}
+
+const COLOUR_CLASSES: Record<string, string> = {
+  wit: 'bg-white',
+  zwart: 'bg-ink',
+};
+const FALLBACK_CLASS = 'bg-line';
+
+const { colour } = Astro.props;
+const fill = COLOUR_CLASSES[colour] ?? FALLBACK_CLASS;
+---
+
+<span aria-hidden="true" class={`inline-block size-3 shrink-0 rounded-full border border-ink-soft ${fill}`}></span>
