@@ -4,6 +4,7 @@ interface Props {
   variant?: 'primary' | 'secondary' | 'inverse';
   external?: boolean;
   class?: string;
+  'aria-label'?: string;
 }
 
 const {
@@ -11,6 +12,7 @@ const {
   variant = 'primary',
   external = false,
   class: className = '',
+  'aria-label': ariaLabel,
 } = Astro.props;
 
 const variants = {
@@ -22,6 +24,7 @@ const variants = {
 
 <a
   href={href}
+  aria-label={ariaLabel}
   target={external ? '_blank' : undefined}
   rel={external ? 'noopener noreferrer' : undefined}
   class:list={[
