@@ -605,21 +605,28 @@ for (const width of [1280, 1920]) {
   test.describe(`desktop prijzen text at ${width}px`, () => {
     test.use({ viewport: { width, height: 900 } });
 
-    const isSingleLine = (locator: Locator) =>
+    // Line count depends on the platform font, so assert the cause instead:
+    // the paragraph must use its container's full width (no max-width cap).
+    const fillsContainer = (locator: Locator) =>
       locator.evaluate((element) => {
-        const style = getComputedStyle(element);
-        const lineHeight =
-          parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.5;
-        return element.getBoundingClientRect().height <= lineHeight * 1.6;
+        const parent = element.parentElement!;
+        const parentStyle = getComputedStyle(parent);
+        const available =
+          parent.clientWidth -
+          parseFloat(parentStyle.paddingLeft) -
+          parseFloat(parentStyle.paddingRight);
+        return Math.abs(element.getBoundingClientRect().width - available) <= 1;
       });
 
-    test('intro and lead paragraph each fit on one line', async ({ page }) => {
+    test('intro and lead paragraph use the full container width', async ({
+      page,
+    }) => {
       await page.goto('prijzen/');
       const intro = page.getByTestId('page-intro');
       const lead = page.locator('#strings-heading + p');
 
-      expect(await isSingleLine(intro)).toBe(true);
-      expect(await isSingleLine(lead)).toBe(true);
+      expect(await fillsContainer(intro)).toBe(true);
+      expect(await fillsContainer(lead)).toBe(true);
     });
   });
 }
