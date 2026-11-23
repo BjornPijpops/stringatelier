@@ -126,80 +126,116 @@ for (const phone of PHONES) {
         await page.goto('prijzen/');
       });
 
-      test('uses input text of at least 16px so iOS does not zoom', async ({
+      const row = (page: Page, name: string) =>
+        page.getByRole('group', { name, exact: true });
+      const plus = (page: Page, name: string) =>
+        page.getByRole('button', { name: `Eén ${name} meer` });
+      const minus = (page: Page, name: string) =>
+        page.getByRole('button', { name: `Eén ${name} minder` });
+
+      test('lists one row per string type, own string first', async ({
         page,
       }) => {
-        await page.locator('#calc-add').click();
-        for (const selector of ['[data-string]', '[data-quantity]']) {
-          for (const field of await page.locator(selector).all()) {
-            const size = await field.evaluate((el) =>
-              parseFloat(getComputedStyle(el).fontSize),
-            );
-            expect(size, selector).toBeGreaterThanOrEqual(MIN_INPUT_TEXT_PX);
-          }
-        }
+        await expect(page.locator('#calc-rows [data-row]')).toHaveCount(6);
+        await expect(
+          page.locator('#calc-rows [data-row]').first(),
+        ).toContainText('Eigen snaar');
+        await expect(row(page, 'Eigen snaar')).toContainText(
+          '12,00 per racket · alleen service',
+        );
+        await expect(row(page, 'BG-65 wit')).toContainText('16,50 per racket');
+        await expect(row(page, 'BG-80 Power wit')).toContainText('18,00');
       });
 
-      test('shows the total for own strings and for a chosen string', async ({
+      test('starts empty without a misleading €0,00 total', async ({
         page,
       }) => {
-        await expect(page.locator('#calc-total')).toContainText('12,00');
+        await expect(page.locator('#calc-empty')).toContainText(
+          'Kies hierboven je snaar en aantal.',
+        );
+        await expect(page.locator('#calc-empty')).toContainText(
+          'Eigen snaar? Dan betaal je enkel € 12,00 per racket.',
+        );
+        await expect(page.locator('#calc-summary')).toBeHidden();
+        await expect(page.locator('#calculator')).not.toContainText('0,00');
+        await expect(row(page, 'BG-65 wit').locator('output')).toHaveText('0');
+        await expect(minus(page, 'BG-65 wit')).toBeDisabled();
+      });
 
-        await page.locator('[data-string]').selectOption('bg-80-wit');
-        await page.locator('[data-quantity]').fill('2');
-        await expect(page.locator('#calc-total')).toContainText('36,00');
+      test('steppers are at least 44px and quantities readable', async ({
+        page,
+      }) => {
+        for (const button of await page.locator('[data-step]').all()) {
+          const box = (await button.boundingBox())!;
+          expect(box.width).toBeGreaterThanOrEqual(MIN_TAP_TARGET_PX);
+          expect(box.height).toBeGreaterThanOrEqual(MIN_TAP_TARGET_PX);
+        }
+        const size = await page
+          .locator('[data-quantity]')
+          .first()
+          .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+        expect(size).toBeGreaterThanOrEqual(MIN_INPUT_TEXT_PX);
+      });
+
+      test('shows the total for a single row without a breakdown', async ({
+        page,
+      }) => {
+        await plus(page, 'BG-80 wit').click();
+        await plus(page, 'BG-80 wit').click();
+
+        await expect(page.locator('#calc-total')).toHaveText(/36,00/);
+        await expect(page.locator('#calc-summary')).toContainText('2 rackets');
+        await expect(page.locator('#calc-empty')).toBeHidden();
+        await expect(page.locator('#calc-breakdown')).toBeHidden();
       });
 
       test('combines different strings in one total', async ({ page }) => {
-        await page.locator('[data-string]').selectOption('bg-65-wit');
-        await page.locator('[data-quantity]').fill('2');
-        await page.locator('#calc-add').click();
-        await page.locator('[data-string]').nth(1).selectOption('bg-80-zwart');
-        await page.locator('#calc-add').click();
+        await plus(page, 'BG-65 wit').click();
+        await plus(page, 'BG-80 Power wit').click();
 
-        await expect(page.locator('[data-line]')).toHaveCount(3);
         await expect(page.locator('#calc-breakdown li')).toHaveText([
-          /2 × BG-65 wit.*33,00/,
-          /1 × BG-80 zwart.*18,00/,
-          /1 × eigen snaar.*12,00/,
+          /1 × BG-65 wit.*16,50/,
+          /1 × BG-80 Power wit.*18,00/,
         ]);
-        await expect(page.locator('#calc-total')).toContainText('63,00');
+        await expect(page.locator('#calc-total')).toHaveText(/34,50/);
+        await expect(page.locator('#calc-summary')).toContainText('2 rackets');
       });
 
-      test('removes a line again and keeps at least one', async ({ page }) => {
-        await expect(page.locator('[data-remove]:visible')).toHaveCount(0);
-
-        await page.locator('#calc-add').click();
-        await page.locator('[data-string]').nth(1).selectOption('bg-80-wit');
-        await expect(page.locator('#calc-total')).toContainText('30,00');
-
-        await page.locator('[data-remove]').first().click();
-        await expect(page.locator('[data-line]')).toHaveCount(1);
-        await expect(page.locator('#calc-total')).toContainText('18,00');
-        await expect(page.locator('[data-remove]:visible')).toHaveCount(0);
-      });
-
-      test('asks for a valid quantity instead of showing a wrong total', async ({
+      test('minus returns to the empty state and stops at zero', async ({
         page,
       }) => {
-        await page.locator('[data-quantity]').fill('0');
-        await expect(page.locator('#calc-total')).toBeEmpty();
-        await expect(page.locator('#calc-breakdown')).toContainText(
-          'tussen 1 en',
+        await plus(page, 'Eigen snaar').click();
+        await expect(page.locator('#calc-total')).toHaveText(/12,00/);
+        await expect(page.locator('#calc-summary')).toContainText('1 racket');
+
+        await minus(page, 'Eigen snaar').click();
+        await expect(minus(page, 'Eigen snaar')).toBeDisabled();
+        await expect(page.locator('#calc-summary')).toBeHidden();
+        await expect(page.locator('#calc-empty')).toBeVisible();
+      });
+
+      test('plus stops at the maximum quantity', async ({ page }) => {
+        const add = plus(page, 'BG-65 wit');
+        for (let i = 0; i < 20; i++) await add.click();
+
+        await expect(add).toBeDisabled();
+        await expect(row(page, 'BG-65 wit').locator('output')).toHaveText('20');
+      });
+
+      test('keeps the last row reachable above the sticky total', async ({
+        page,
+      }) => {
+        await plus(page, 'BG-65 wit').click();
+        const lastPlus = plus(page, 'BG-80 Power wit');
+        await lastPlus.evaluate((el) =>
+          el.scrollIntoView({ block: 'center', behavior: 'instant' }),
         );
-      });
 
-      test('stepper buttons change the quantity within its limits', async ({
-        page,
-      }) => {
-        const quantity = page.locator('[data-quantity]');
-        await page.getByRole('button', { name: 'Eén racket meer' }).click();
-        await expect(quantity).toHaveValue('2');
-        await expect(page.locator('#calc-total')).toContainText('24,00');
-
-        await page.getByRole('button', { name: 'Eén racket minder' }).click();
-        await page.getByRole('button', { name: 'Eén racket minder' }).click();
-        await expect(quantity).toHaveValue('1');
+        const buttonBox = (await lastPlus.boundingBox())!;
+        const footerBox = (await page.locator('#calc-summary').boundingBox())!;
+        expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(
+          footerBox.y + 1,
+        );
       });
     });
     test.describe('prijzen string cards', () => {
@@ -231,34 +267,65 @@ for (const phone of PHONES) {
           page.locator('article').first().getByText('5 van 5'),
         ).toHaveCount(1);
       });
-
-      test('the calculator dropdown shows all-in prices per string', async ({
-        page,
-      }) => {
-        await expect(
-          page.locator('[data-string] option[value="bg-65-wit"]'),
-        ).toContainText('16,50');
-        await expect(
-          page.locator('[data-string] option[value="bg-80-power-wit"]'),
-        ).toContainText('18,00');
-      });
     });
 
-    test('contact offers mail plus a call and a WhatsApp button per person', async ({
+    test('prijzen shows the price card before the calculator', async ({
+      page,
+    }) => {
+      await page.goto('prijzen/');
+      const card = (await page.locator('#service-price').boundingBox())!;
+      const calculator = (await page.locator('#calculator').boundingBox())!;
+      expect(card.y + card.height).toBeLessThanOrEqual(calculator.y);
+      expect(card.height).toBeLessThan(260);
+      await expect(page.locator('#service-price')).not.toContainText(
+        'Dat is ons tarief',
+      );
+      await expect(page.locator('#service-price')).toContainText(
+        'Eigen snaar bij? Dan betaal je enkel € 12,00.',
+      );
+    });
+
+    test('contact lists each person with call and WhatsApp buttons', async ({
       page,
     }) => {
       await page.goto('contact/');
+      await expect(
+        page.getByRole('heading', { level: 2, name: 'Bereik ons' }),
+      ).toBeVisible();
+      await expect(page.locator('#reach-heading ~ ul h3')).toHaveText([
+        'Bjorn',
+        'Neal',
+      ]);
       await expect(page.locator('main a[href^="mailto:"]')).toHaveCount(1);
       await expect(page.locator('main a[href^="tel:+32"]')).toHaveCount(2);
       await expect(
         page.locator('main a[href^="https://wa.me/32"]'),
       ).toHaveCount(2);
-      await expect(
-        page.getByRole('link', { name: 'WhatsApp Bjorn' }),
-      ).toHaveAttribute('href', 'https://wa.me/32477191385');
+
+      const call = page.getByRole('link', { name: 'Bel Bjorn' });
+      const whatsApp = page.getByRole('link', { name: 'WhatsApp Bjorn' });
+      await expect(call).toHaveText('Bel');
+      await expect(whatsApp).toHaveText('WhatsApp');
+      await expect(whatsApp).toHaveAttribute(
+        'href',
+        'https://wa.me/32477191385',
+      );
       await expect(
         page.getByRole('link', { name: 'Bel Neal' }),
       ).toHaveAttribute('href', 'tel:+32470630288');
+
+      const callBox = (await call.boundingBox())!;
+      const whatsAppBox = (await whatsApp.boundingBox())!;
+      expect(Math.abs(callBox.width - whatsAppBox.width)).toBeLessThanOrEqual(
+        1,
+      );
+      expect(Math.abs(callBox.height - whatsAppBox.height)).toBeLessThanOrEqual(
+        1,
+      );
+      await expect(page.getByText('0477 19 13 85')).not.toHaveAttribute(
+        'href',
+        /.+/,
+      );
     });
 
     test('home gives clear next steps and the key facts', async ({ page }) => {
@@ -327,8 +394,31 @@ for (const phone of PHONES) {
   });
 }
 
+test.describe('desktop prijzen', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('price card sits beside the calculator without stretching', async ({
+    page,
+  }) => {
+    await page.goto('prijzen/');
+    const card = (await page.locator('#service-price').boundingBox())!;
+    const calculator = (await page.locator('#calculator').boundingBox())!;
+
+    expect(card.x + card.width).toBeLessThanOrEqual(calculator.x);
+    expect(card.height).toBeLessThan(calculator.height / 2);
+  });
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
+
+  test('prijzen keeps a single column next to the price list', async ({
+    page,
+  }) => {
+    await page.goto('prijzen/');
+    await expect(page.locator('#service-price')).toBeVisible();
+    await expect(page.locator('#calculator')).toBeHidden();
+  });
 
   test('prijzen still lists the all-in prices', async ({ page }) => {
     await page.goto('prijzen/');
