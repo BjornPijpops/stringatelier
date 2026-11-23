@@ -37,7 +37,7 @@ const stepButtonClass =
       </label>
       <select
         id="calc-select"
-        class="min-h-12 w-full rounded-lg border border-line bg-white px-3 text-base"
+        class="min-h-12 w-full rounded-lg border border-line bg-white px-3 text-base aria-[invalid=true]:border-red-700"
       >
         <option value="">Kies een snaar…</option>
         <option value={OWN_STRING_VALUE}>
@@ -91,7 +91,6 @@ const stepButtonClass =
 
   <template id="calc-line-template">
     <li
-      role="group"
       class="flex flex-wrap items-center gap-x-3 gap-y-2 py-3 transition-colors duration-500 motion-reduce:transition-none"
       data-line
     >
@@ -174,6 +173,7 @@ const stepButtonClass =
     removeLine,
     setLineQuantity,
     summarizeOrder,
+    type AddOutcome,
     type Cart,
     type OrderSummary,
     type SummaryRow,
@@ -234,7 +234,6 @@ const stepButtonClass =
     function updateLine(line: HTMLElement, row: SummaryRow) {
       const atMax = row.quantity >= MAX_QUANTITY;
       const isLastRacket = row.quantity === 1;
-      line.setAttribute('aria-label', row.name);
       find(line, '[data-name]').textContent = row.name;
       find(line, '[data-unit]').textContent =
         `${formatMoney(row.unitCents)} per racket`;
@@ -318,27 +317,39 @@ const stepButtonClass =
       select.removeAttribute('aria-describedby');
     }
 
-    function addOne(id: string, shouldFlash: boolean) {
+    /** Adds one racket and reports what happened; the caller decides how to react. */
+    function addOne(id: string): AddOutcome {
       const name = stringNames.get(id);
       if (!name) throw new Error(`Unknown string: ${id}`);
       const { cart: nextCart, outcome } = addToCart(cart, { id, name });
       if (outcome === 'maxed') {
         announce(`Maximum bereikt voor ${name}`);
-        return;
+        return outcome;
       }
       cart = nextCart;
       const order = render();
-      if (outcome === 'merged' && shouldFlash) flash(id);
       announce(`${name} toegevoegd. ${describeOrder(order)}`);
+      return outcome;
+    }
+
+    /** Moves focus to the minus/remove button of the line at `index`, or to the picker. */
+    function focusAfterRemoval(index: number) {
+      const lines = list.children;
+      const next = lines[Math.min(index, lines.length - 1)];
+      const target = next?.querySelector<HTMLButtonElement>(
+        '[data-action="minus"]',
+      );
+      (target ?? select).focus();
     }
 
     function stepDown(id: string) {
-      const line = cart.find((candidate) => candidate.id === id);
+      const index = cart.findIndex((candidate) => candidate.id === id);
+      const line = cart[index];
       if (!line) return;
       if (line.quantity === 1) {
         cart = removeLine(cart, id);
         announce(`${line.name} verwijderd. ${describeOrder(render())}`);
-        select.focus();
+        focusAfterRemoval(index);
         return;
       }
       cart = setLineQuantity(cart, id, line.quantity - 1);
@@ -353,7 +364,8 @@ const stepButtonClass =
         return;
       }
       clearError();
-      addOne(select.value, true);
+      const id = select.value;
+      if (addOne(id) === 'merged') flash(id);
       select.value = '';
       select.focus();
     });
@@ -368,7 +380,7 @@ const stepButtonClass =
       );
       const id = button?.closest<HTMLElement>('[data-line]')?.dataset.id;
       if (!button || !id) return;
-      if (button.dataset.action === 'plus') addOne(id, false);
+      if (button.dataset.action === 'plus') addOne(id);
       else stepDown(id);
     });
 

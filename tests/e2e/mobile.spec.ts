@@ -130,7 +130,7 @@ for (const phone of PHONES) {
       const addButton = (page: Page) =>
         page.getByRole('button', { name: 'Toevoegen' });
       const line = (page: Page, name: string) =>
-        page.getByRole('group', { name, exact: true });
+        page.locator('#calc-lines li').filter({ hasText: name });
       const plus = (page: Page, name: string) =>
         page.getByRole('button', { name: `Eén ${name} meer` });
       const status = (page: Page) => page.locator('#calc-status');
@@ -283,10 +283,24 @@ for (const phone of PHONES) {
 
         await expect(page.locator('#calc-lines li')).toHaveCount(1);
         await expect(page.locator('#calc-total')).toHaveText('€ 16,50');
-        await expect(select(page)).toBeFocused();
+        await expect(
+          page.getByRole('button', { name: 'Verwijder BG-65 wit' }),
+        ).toBeFocused();
         await expect(status(page)).toHaveText(
           'Eigen snaar verwijderd. 1 racket, totaal € 16,50.',
         );
+      });
+
+      test('removing the last of several lines focuses the previous line', async ({
+        page,
+      }) => {
+        await addString(page, 'own');
+        await addString(page, 'bg-65-wit');
+        await page.getByRole('button', { name: 'Verwijder BG-65 wit' }).click();
+
+        await expect(
+          page.getByRole('button', { name: 'Verwijder Eigen snaar' }),
+        ).toBeFocused();
       });
 
       test('stops at the maximum quantity', async ({ page }) => {
