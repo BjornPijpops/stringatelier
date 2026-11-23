@@ -18,7 +18,7 @@ Service price is €12 per racket. Strings cost extra: BG-65 white/black €4.50
 Option 3. One `/prijzen` page, in this order: page header, string cards, calculator, closing call to action.
 
 - **Price in the intro.** The page header states the stringing price once, in bold brand blue: "Besnaren kost € 12 per racket, plus de snaar die je kiest. Eigen snaar? Dan betaal je alleen die € 12." The separate price card was removed; it repeated the intro and pushed the calculator down.
-- **Price on every string card.** Each card shows the all-in price per racket ("€ 16,50 per racket", "vanaf" when colours differ in price) and the breakdown ("besnaren € 12,00 + snaar € 4,50"). This is the main answer to "what will it cost me?".
+- **Price on every string card.** Variants are grouped by identical string price (`groupFamilyPrices`). One group (the current data): a big all-in price ("€ 16,50 per racket") with the colour dots and names below. Several groups: one row per group with the colour(s) on the left and the all-in price on the right, plus "per racket, kleur naar keuze". The card no longer shows a "besnaren + snaar" split, "vanaf" or a separate colour row; the page lead says "Prijzen zijn per racket, besnaren inclusief." This is the main answer to "what will it cost me?".
 - **Calculator as a cart.** For several rackets or strings, the calculator on a soft band below the cards has a native `<select>` (own string first, then strings grouped per family with `<optgroup>`) and a "Toevoegen" button. Adding the same string merges into one line (quantity + 1, max 20). Each line has a − / + stepper (the − becomes a trash button at 1), and the total sits below the lines. Nothing is stored; the cart lives in memory.
 - Without JavaScript the card is hidden and a `<noscript>` list shows "Eigen snaar (alleen besnaren)" and every string's total.
 
@@ -27,6 +27,10 @@ All of it reads from **one typed pricing data module** (`src/data/pricing.ts`). 
 ## Pricing rule
 
 `total per racket = service price (€12) + string price`; with own strings: `€12`. Quantity multiplies the total. Each cart line is priced with this rule and the order total is the sum of the lines.
+
+## Amendment 2026-11-23
+
+Replaced "vanaf when colours differ" with the per-colour price-group rule above and dropped the "besnaren € 12,00 + snaar € 4,50" split from the cards (it made the cards tall and repeated the intro). The price rule itself is unchanged.
 
 ## Consequences
 
