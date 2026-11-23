@@ -429,6 +429,30 @@ test.describe('large system font (150% root size)', () => {
         expect(overflow).toBeLessThanOrEqual(0);
       });
     }
+
+    for (const activeRows of [3, 6]) {
+      test(`prijzen calculator with ${activeRows} active rows does not overflow at ${width}px`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 700 });
+        await page.goto('prijzen/');
+        await page.addStyleTag({ content: 'html { font-size: 24px; }' });
+        const increments = page.locator('[data-step="1"]');
+        for (let index = 0; index < activeRows; index += 1) {
+          await increments.nth(index).click();
+        }
+        await expect(page.locator('#calc-summary')).toBeVisible();
+        const overflow = await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+        );
+        expect(overflow).toBeLessThanOrEqual(0);
+        const total = (await page.locator('#calc-total').boundingBox())!;
+        expect(total.x).toBeGreaterThanOrEqual(0);
+        expect(total.x + total.width).toBeLessThanOrEqual(width);
+      });
+    }
   }
 });
 
