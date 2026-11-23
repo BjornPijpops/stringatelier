@@ -3,7 +3,10 @@ import Section from './Section.astro';
 
 interface Props {
   title: string;
-  /** Plain-text intro. For markup (e.g. bold) use the `intro` slot instead. */
+  /**
+   * Intro text. Inline content only: it renders inside a `<p>`, so no block elements.
+   * For markup (e.g. bold) use the `intro` slot instead; the slot wins when both are given.
+   */
   intro?: string;
 }
 
@@ -15,8 +18,7 @@ const hasIntroSlot = Astro.slots.has('intro');
   <h1 class="text-3xl sm:text-5xl">{title}</h1>
   {(intro || hasIntroSlot) && (
     <p class="mt-4 max-w-3xl text-lg text-ink-soft">
-      {intro}
-      <slot name="intro" />
+      {hasIntroSlot ? <slot name="intro" /> : intro}
     </p>
   )}
 </Section>
