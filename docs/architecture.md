@@ -45,8 +45,8 @@ docs/          architecture, ADRs, roadmap
 
 ## Price calculator
 
-- `calculateTotal` (`src/lib/calculateTotal.ts`) is a pure, unit-tested function: `(service + string) x quantity`, or service only for own strings.
-- `PriceCalculator.astro` is a progressive enhancement: hidden by default and revealed by its script, so without JavaScript visitors still see the full price cards.
+- `calculateTotal` (`src/lib/calculateTotal.ts`) is a pure, unit-tested function: `(service + string) x quantity`, or service only for own strings. `calculateOrder` sums several such lines, so one order can mix string types (e.g. 2 x BG-65 + 1 x BG-80 + 1 own string).
+- The calculator UI shows one line (string + quantity) per combination; visitors add or remove lines and see a per-line breakdown plus the total.- `PriceCalculator.astro` is a progressive enhancement: hidden by default and revealed by its script, so without JavaScript visitors still see the full price cards.
 - It reads the same `src/data/pricing.ts` data as the overview, so prices are only ever changed in one place.
 
 ## Contact page
