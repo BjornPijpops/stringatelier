@@ -24,13 +24,13 @@ import {
   />
 
   <Section aria-label="Prijs en rekenhulp">
-    <div class="grid gap-6 md:grid-cols-2 md:items-start md:has-[#calculator.hidden]:grid-cols-1">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start md:has-[#calculator.hidden]:grid-cols-1 [&>*]:min-w-0">
       <div
         id="service-price"
         class="rounded-2xl bg-surface-alt p-5 md:sticky md:top-6 sm:p-8"
       >
         <h2 class="text-xl">Besnaren</h2>
-        <p class="mt-2 flex flex-wrap items-baseline gap-x-3 font-display text-5xl text-brand">
+        <p class="mt-2 flex flex-wrap items-baseline gap-x-3 font-display text-4xl text-brand sm:text-5xl">
           <span>{formatMoney(servicePriceCents)}</span>
           <span class="text-base text-ink-soft">per racket</span>
         </p>
@@ -50,7 +50,7 @@ import {
       Drie snaren, drie karakters. Twijfel je? BG-65 is de veilige keuze:
       comfortabel en lang bruikbaar.
     </p>
-    <div class="grid gap-4 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
       {stringFamilies.map((family) => (
         <StringFamilyCard {family} />
       ))}

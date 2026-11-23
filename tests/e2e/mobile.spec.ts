@@ -222,20 +222,38 @@ for (const phone of PHONES) {
         await expect(row(page, 'BG-65 wit').locator('output')).toHaveText('20');
       });
 
-      test('keeps the last row reachable above the sticky total', async ({
+      test('total footer sits below all rows and never overlaps them', async ({
         page,
       }) => {
-        await plus(page, 'BG-65 wit').click();
-        const lastPlus = plus(page, 'BG-80 Power wit');
-        await lastPlus.evaluate((el) =>
-          el.scrollIntoView({ block: 'center', behavior: 'instant' }),
-        );
+        const buttons = await page.locator('[data-step="1"]').all();
+        expect(buttons).toHaveLength(6);
+        for (const button of buttons) await button.click();
 
-        const buttonBox = (await lastPlus.boundingBox())!;
-        const footerBox = (await page.locator('#calc-summary').boundingBox())!;
-        expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(
+        const footer = page.locator('#calc-summary');
+        await expect(footer).toBeVisible();
+        const position = await footer.evaluate(
+          (el) => getComputedStyle(el.parentElement!).position,
+        );
+        expect(position).toBe('static');
+
+        const footerBox = (await footer.boundingBox())!;
+        const lastRowBox = (await page
+          .locator('#calc-rows [data-row]')
+          .last()
+          .boundingBox())!;
+        expect(lastRowBox.y + lastRowBox.height).toBeLessThanOrEqual(
           footerBox.y + 1,
         );
+        // Scrolling anywhere must never put the footer over a row.
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const rows = await page.locator('#calc-rows [data-row]').all();
+        for (const r of rows) {
+          await r.scrollIntoViewIfNeeded();
+          const box = (await r.boundingBox())!;
+          const f = (await footer.boundingBox())!;
+          const overlaps = box.y < f.y + f.height && box.y + box.height > f.y;
+          expect(overlaps).toBe(false);
+        }
       });
     });
     test.describe('prijzen string cards', () => {
@@ -393,6 +411,26 @@ for (const phone of PHONES) {
     });
   });
 }
+
+test.describe('large system font (150% root size)', () => {
+  for (const width of [320, 390]) {
+    for (const { name, path } of PAGES) {
+      test(`${name} does not overflow horizontally at ${width}px`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 700 });
+        await page.goto(path);
+        await page.addStyleTag({ content: 'html { font-size: 24px; }' });
+        const overflow = await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+        );
+        expect(overflow).toBeLessThanOrEqual(0);
+      });
+    }
+  }
+});
 
 test.describe('desktop prijzen', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
