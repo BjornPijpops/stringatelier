@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 /** Phone widths: small Android/iPhone SE, common iPhone, large phone. */
 const PHONES = [
@@ -351,7 +351,7 @@ for (const phone of PHONES) {
         await page.goto('prijzen/');
       });
 
-      test('show the all-in price with its breakdown on every card', async ({
+      test('show one all-in price per colour group on every card', async ({
         page,
       }) => {
         await expect(page.locator('article h3')).toHaveText([
@@ -362,20 +362,35 @@ for (const phone of PHONES) {
         const cards = page.locator('article');
         await expect(cards.nth(0)).toContainText('€ 16,50');
         await expect(cards.nth(0)).toContainText('per racket');
-        await expect(cards.nth(0)).toContainText(
-          'besnaren € 12,00 + snaar € 4,50',
-        );
+        await expect(cards.nth(0)).toContainText('wit, zwart');
         await expect(cards.nth(1)).toContainText('€ 18,00');
+        await expect(cards.nth(1)).toContainText('wit, zwart');
         await expect(cards.nth(2)).toContainText('€ 18,00');
+        await expect(cards.nth(2)).toContainText('wit');
         for (const card of await cards.all()) {
           await expect(card).toContainText('Ideaal voor');
+          const prices = (await card.innerText()).match(/€\s\d+,\d{2}/g);
+          expect(prices).toHaveLength(1);
+        }
+      });
+
+      test('no longer show the split, "vanaf" or a colour row', async ({
+        page,
+      }) => {
+        for (const card of await page.locator('article').all()) {
+          const text = await card.innerText();
+          expect(text).not.toMatch(/besnaren\s+€/);
+          expect(text).not.toMatch(/\+\s*snaar/);
+          expect(text).not.toContain('vanaf');
+          expect(text).not.toContain('Kleur:');
         }
       });
 
       test('merge feel and thickness into one line', async ({ page }) => {
         const card = page.locator('article').first();
-        await expect(card).toContainText('Zacht en vergevingsgezind · 0,70 mm');
-        await expect(card).toContainText('Kleur: wit of zwart');
+        await expect(card).toContainText(
+          'Gevoel: Zacht en vergevingsgezind · 0,70 mm',
+        );
       });
 
       test('shows each recommendation once', async ({ page }) => {
@@ -585,6 +600,29 @@ test.describe('desktop prijzen', () => {
     expect(calculator.y).toBeGreaterThan(boxes[0]!.y + boxes[0]!.height);
   });
 });
+
+for (const width of [1280, 1920]) {
+  test.describe(`desktop prijzen text at ${width}px`, () => {
+    test.use({ viewport: { width, height: 900 } });
+
+    const isSingleLine = (locator: Locator) =>
+      locator.evaluate((element) => {
+        const style = getComputedStyle(element);
+        const lineHeight =
+          parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.5;
+        return element.getBoundingClientRect().height <= lineHeight * 1.6;
+      });
+
+    test('intro and lead paragraph each fit on one line', async ({ page }) => {
+      await page.goto('prijzen/');
+      const intro = page.locator('main p').first();
+      const lead = page.locator('#strings-heading + p');
+
+      expect(await isSingleLine(intro)).toBe(true);
+      expect(await isSingleLine(lead)).toBe(true);
+    });
+  });
+}
 
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
