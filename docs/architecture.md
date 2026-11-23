@@ -20,7 +20,7 @@ flowchart LR
 ```
 src/
   data/        single source of truth (pricing.ts, contact.ts)
-  lib/         pure, tested logic (calculateTotal.ts, money formatting)
+  lib/         pure, tested logic (calculateTotal.ts, orderSummary.ts cart helpers, familyPricing.ts, money formatting)
   components/  reusable UI (Button, Card, StringFamilyCard, PriceCalculator, LocationMap, ...)
   layouts/     BaseLayout (head/SEO, header, footer)
   pages/       index, prijzen, contact
@@ -46,11 +46,25 @@ docs/          architecture, ADRs, roadmap
 ## Price calculator
 
 - `calculateTotal` (`src/lib/calculateTotal.ts`) is a pure, unit-tested function: `(service + string) x quantity`, or service only for own strings. `calculateOrder` sums several such lines, so one order can mix string types (e.g. 2 x BG-65 + 1 x BG-80 + 1 own string).
-- The calculator is a static list rendered at build time: one row per string type ("Eigen snaar" first, then every `stringOptions` entry) with its all-in price per racket and a − / + stepper. All quantities start at 0, so there is no silent default.
-- `src/lib/orderSummary.ts` holds the testable logic: `stepQuantity` (clamps 0..`MAX_QUANTITY`) and `summarizeOrder` (drops rows at 0, calls `calculateOrder`, returns breakdown rows, racket count and total; `null` for an empty order so no `€ 0,00` is shown). The script in `PriceCalculator.astro` only reads quantities from the DOM and renders that summary.
-- The footer (hint when empty; breakdown when 2+ rows are active, racket count and total otherwise) is a plain static block below the rows at every size (a sticky footer hid rows on 320px screens). Only the total is an `aria-live` region.
-- `PriceCalculator.astro` is a progressive enhancement: hidden by default and revealed by its script, so without JavaScript visitors still see the `<noscript>` price list.
-- It reads the same `src/data/pricing.ts` data as the overview, so prices are only ever changed in one place.
+- `PriceCalculator.astro` renders a picker at build time: a native `<select>` with "Kies een snaar…", then "Eigen snaar (alleen besnaren)", then one `<optgroup>` per entry of `stringFamilies` (options like "BG-65 wit · € 16,50"). It scales to many strings; the cards above it are the part that would need rework at ~6+ families (consider horizontal scroll or a disclosure).
+- `src/lib/orderSummary.ts` holds the testable cart logic: `addToCart` (appends, or merges a duplicate with quantity + 1 clamped at `MAX_QUANTITY`, reporting `added`/`merged`/`maxed`), `setLineQuantity`, `removeLine`, `stepQuantity`, `formatRacketCount` and `summarizeOrder` (drops empty lines, calls `calculateOrder`, returns rows with id, name, quantity, unit and line totals, racket count and total; `null` for an empty order so no `€ 0,00` is shown).
+- Calculator flow:
+
+```mermaid
+flowchart LR
+  Pick[Select + Toevoegen] --> Add[addToCart]
+  Stepper[Line stepper] --> Set[setLineQuantity / removeLine]
+  Add --> Cart[(cart in memory)]
+  Set --> Cart
+  Cart --> Summary[summarizeOrder]
+  Summary --> Render[update lines, total, live status]
+```
+
+- The cart array is the single source of truth. The script in `PriceCalculator.astro` re-renders from it (lines come from a `<template>` and are updated in place, so focus stays on the pressed button) and never reads state back from the DOM.
+- Empty state: a short hint and no total. Adding with nothing picked shows "Kies eerst een snaar." (`role="alert"`, `aria-invalid` on the select). After adding, the picker resets and focus returns to it; after removing a line, focus also moves to the picker.
+- A visually hidden `role="status"` element announces changes ("BG-65 wit toegevoegd. 2 rackets, totaal € 33,00."). The visible total is not a live region, to avoid double announcements.
+- The card is hidden until its script runs; without JavaScript the `<noscript>` price list next to it is shown instead.
+- It reads the same `src/data/pricing.ts` data as the cards, so prices are only ever changed in one place. `summarizeFamilyPrice` (`src/lib/familyPricing.ts`) gives the cards their "from" price and whether colours differ in price.
 
 ## Contact page
 
@@ -67,9 +81,9 @@ docs/          architecture, ADRs, roadmap
 
 Decided with the `ux-designer` role, from the visitor's point of view (a player on a phone who wants their total price):
 
-- **Tool first.** On mobile the compact EUR 12 card comes first, then the calculator in a brand-blue card; from `md` they sit side by side (price card at natural height, sticky). The calculator is where prices live: each row shows the all-in price per racket (service + string). Without JavaScript a `<noscript>` list shows the same prices.
-- **Explain, don't repeat.** The string section ("Welke snaar past bij jou?") has no prices. It helps visitors choose: one card per type (BG-65, BG-80, BG-80 Power) with a one-line character, 1-5 dot ratings for power, control and durability, feel, thickness and a "best for" line. The ratings come from a comparison table supplied by the owner, translated to a 1-5 scale in `data/pricing.ts`. Dots are decorative; screen readers get "3 van 5" text (`RatingDots.astro`).
-- **Grouped by type.** Visitors choose a type first and a colour second, so colours are listed on the card, not as separate cards. The flat `stringOptions` list for the calculator is derived from `stringFamilies`.
+- **Answer first, tool second.** The page header states the € 12 stringing price. The string cards come next and each shows its all-in price per racket with the breakdown ("besnaren € 12,00 + snaar € 4,50"), so most visitors have their answer without touching anything. The calculator follows on a soft band, deliberately secondary ("Meerdere rackets of snaren? Bereken je totaal"). Without JavaScript the calculator is hidden and a `<noscript>` list shows the same prices.
+- **Help choosing.** The string section ("Welke snaar past bij jou?") has one card per type (BG-65, BG-80, BG-80 Power): name, character, price, 1-5 dot ratings for power, control and durability, one line with feel and thickness, a "best for" pill and the colours. The ratings come from a comparison table supplied by the owner, translated to a 1-5 scale in `data/pricing.ts`. Dots are decorative; screen readers get "3 van 5" text (`RatingDots.astro`).
+- **Grouped by type.** Visitors choose a type first and a colour second, so colours are listed on the card, not as separate cards. The calculator picker lists the colours per type in `<optgroup>`s, and the flat `stringOptions` list is derived from `stringFamilies`.
 - **Next step.** The page ends with a call to action to the contact page.
 
 ## Visual system and home page (UX)
