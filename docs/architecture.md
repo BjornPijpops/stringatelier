@@ -46,14 +46,17 @@ docs/          architecture, ADRs, roadmap
 ## Price calculator
 
 - `calculateTotal` (`src/lib/calculateTotal.ts`) is a pure, unit-tested function: `(service + string) x quantity`, or service only for own strings. `calculateOrder` sums several such lines, so one order can mix string types (e.g. 2 x BG-65 + 1 x BG-80 + 1 own string).
-- The calculator UI shows one line (string + quantity) per combination; visitors add or remove lines and see a per-line breakdown plus the total.- `PriceCalculator.astro` is a progressive enhancement: hidden by default and revealed by its script, so without JavaScript visitors still see the full price cards.
+- The calculator is a static list rendered at build time: one row per string type ("Eigen snaar" first, then every `stringOptions` entry) with its all-in price per racket and a − / + stepper. All quantities start at 0, so there is no silent default.
+- `src/lib/orderSummary.ts` holds the testable logic: `stepQuantity` (clamps 0..`MAX_QUANTITY`) and `summarizeOrder` (drops rows at 0, calls `calculateOrder`, returns breakdown rows, racket count and total; `null` for an empty order so no `€ 0,00` is shown). The script in `PriceCalculator.astro` only reads quantities from the DOM and renders that summary.
+- The footer (hint when empty; breakdown when 2+ rows are active, racket count and total otherwise) is sticky at the bottom of the panel on mobile and static from `sm`. Only the total is an `aria-live` region.
+- `PriceCalculator.astro` is a progressive enhancement: hidden by default and revealed by its script, so without JavaScript visitors still see the `<noscript>` price list.
 - It reads the same `src/data/pricing.ts` data as the overview, so prices are only ever changed in one place.
 
 ## Contact page
 
 - Contact details, location and handover slots live only in `src/data/contact.ts`; the page renders them.
 - `src/lib/phone.ts` formats Belgian numbers for display and builds international `tel:` and WhatsApp (`wa.me`) links (tested).
-- No contact form: there is no backend (see ADR 0001). Email is a `mailto:` link; each person has a "Bel" (`tel:`) and a "WhatsApp" button, so visitors with a question can message instead of calling.
+- No contact form: there is no backend (see ADR 0001). "Bereik ons" lists each person as a block: name (h3), number as plain text, then equal-width "Bel" (`tel:`) and "WhatsApp" buttons (accessible names "Bel Bjorn", "WhatsApp Bjorn"). The email address (`mailto:`) sits below the people.
 
 ## Mobile-first quality gate
 
@@ -64,7 +67,7 @@ docs/          architecture, ADRs, roadmap
 
 Decided with the `ux-designer` role, from the visitor's point of view (a player on a phone who wants their total price):
 
-- **Tool first.** The calculator sits next to the EUR 12 service price at the top, in a brand-blue card. It is where prices live: each dropdown option shows the all-in price per racket (service + string). Without JavaScript a `<noscript>` list shows the same prices.
+- **Tool first.** On mobile the compact EUR 12 card comes first, then the calculator in a brand-blue card; from `md` they sit side by side (price card at natural height, sticky). The calculator is where prices live: each row shows the all-in price per racket (service + string). Without JavaScript a `<noscript>` list shows the same prices.
 - **Explain, don't repeat.** The string section ("Welke snaar past bij jou?") has no prices. It helps visitors choose: one card per type (BG-65, BG-80, BG-80 Power) with a one-line character, 1-5 dot ratings for power, control and durability, feel, thickness and a "best for" line. The ratings come from a comparison table supplied by the owner, translated to a 1-5 scale in `data/pricing.ts`. Dots are decorative; screen readers get "3 van 5" text (`RatingDots.astro`).
 - **Grouped by type.** Visitors choose a type first and a colour second, so colours are listed on the card, not as separate cards. The flat `stringOptions` list for the calculator is derived from `stringFamilies`.
 - **Next step.** The page ends with a call to action to the contact page.
