@@ -1,180 +1,379 @@
 ---
-import { servicePriceCents, stringOptions } from '../data/pricing';
+import {
+  servicePriceCents,
+  stringFamilies,
+  stringOptions,
+} from '../data/pricing';
 import { formatMoney } from '../lib/formatMoney';
-import { OWN_STRING_NAME, OWN_STRING_VALUE } from '../lib/calculatorConfig';
+import { OWN_STRING_VALUE } from '../lib/calculatorConfig';
 
-const rows = [
-  {
-    id: OWN_STRING_VALUE,
-    name: OWN_STRING_NAME,
-    price: `${formatMoney(servicePriceCents)} per racket · alleen service`,
-  },
-  ...stringOptions.map((option) => ({
-    id: option.id,
-    name: option.name,
-    price: `${formatMoney(servicePriceCents + option.priceCents)} per racket`,
-  })),
-];
+const ownStringLabel = 'Eigen snaar (alleen besnaren)';
 
-const stepButton =
-  'grid size-11 shrink-0 place-items-center rounded-lg bg-white text-2xl font-bold text-brand hover:bg-brand-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-40 disabled:hover:bg-white';
+const stepButtonClass =
+  'grid size-11 shrink-0 place-items-center rounded-lg border border-line bg-white text-2xl leading-none font-bold text-brand hover:bg-brand-soft disabled:opacity-40 disabled:hover:bg-white';
 ---
 
+<!--
+  The card is hidden until its script runs. Without JavaScript the <noscript> price list
+  below it is shown instead, so the key prices are always available.
+-->
 <section
   id="calculator"
-  class="hidden rounded-2xl bg-brand p-4 text-white sm:p-8"
+  class="hidden rounded-2xl border border-line bg-white p-4 sm:p-8"
   aria-labelledby="calculator-heading"
 >
-  <h2 id="calculator-heading" class="text-xl text-white">
-    Bereken je prijs
+  <h2 id="calculator-heading" class="text-xl">
+    Meerdere rackets of snaren? Bereken je totaal
   </h2>
-  <p class="mt-1 text-sm text-brand-soft">
-    Tik op + bij de snaar(en) die je wilt. Combineren kan.
-  </p>
-  <ul class="mt-3 divide-y divide-white/20" id="calc-rows">
-    {rows.map((row) => (
-      <li
-        role="group"
-        aria-label={row.name}
-        class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2"
-        data-row
-        data-id={row.id}
+
+  <form
+    id="calc-form"
+    class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
+    novalidate
+  >
+    <div class="min-w-0 flex-1">
+      <label for="calc-select" class="mb-1 block font-semibold">
+        Kies een snaar
+      </label>
+      <select
+        id="calc-select"
+        class="min-h-12 w-full rounded-lg border border-line bg-white px-3 text-base"
       >
-        <div class="min-w-24 flex-1">
-          <p class="font-semibold leading-tight">{row.name}</p>
-          <p class="text-sm tabular-nums text-brand-soft">{row.price}</p>
-        </div>
-        <button
-          type="button"
-          class={stepButton}
-          data-step="-1"
-          aria-label={`Eén ${row.name} minder`}
-          disabled
-        >
-          &minus;
+        <option value="">Kies een snaar…</option>
+        <option value={OWN_STRING_VALUE}>
+          {ownStringLabel} · {formatMoney(servicePriceCents)}
+        </option>
+        {stringFamilies.map((family) => (
+          <optgroup label={family.name}>
+            {family.variants.map((variant) => (
+              <option value={variant.id}>
+                {family.name} {variant.colour} ·{' '}
+                {formatMoney(servicePriceCents + variant.priceCents)}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </div>
+    <button
+      type="submit"
+      class="min-h-12 w-full rounded-lg bg-brand px-6 font-semibold text-white hover:bg-brand-strong sm:w-auto"
+    >
+      Toevoegen
+    </button>
+  </form>
+  <p
+    id="calc-error"
+    role="alert"
+    class="mt-2 text-sm font-semibold text-red-700 empty:hidden"
+  ></p>
+
+  <p id="calc-empty" class="mt-4 text-ink-soft">
+    Eén racket met je eigen snaar? Dat is {formatMoney(servicePriceCents)}. Kies
+    hierboven een snaar om je totaal te zien.
+  </p>
+
+  <div id="calc-cart" hidden>
+    <ul id="calc-lines" class="mt-4 divide-y divide-line"></ul>
+    <div class="mt-4 flex flex-wrap items-end justify-between gap-2 border-t border-line pt-4">
+      <div class="min-w-0">
+        <p class="font-semibold">Totaal</p>
+        <p id="calc-count" class="text-sm text-ink-soft"></p>
+      </div>
+      <p
+        id="calc-total"
+        class="font-display text-3xl text-brand tabular-nums sm:text-4xl"
+      ></p>
+    </div>
+  </div>
+
+  <div id="calc-status" class="sr-only" role="status" aria-live="polite"></div>
+
+  <template id="calc-line-template">
+    <li
+      role="group"
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 py-3 transition-colors duration-500 motion-reduce:transition-none"
+      data-line
+    >
+      <div class="min-w-40 flex-1">
+        <p class="font-semibold" data-name></p>
+        <p class="text-sm text-ink-soft tabular-nums" data-unit></p>
+        <p class="text-sm text-ink-soft" data-max-hint hidden>
+          Maximaal bereikt
+        </p>
+      </div>
+      <div class="flex items-center gap-1">
+        <button type="button" class={stepButtonClass} data-action="minus">
+          <span aria-hidden="true" data-minus-glyph>
+            &minus;
+          </span>
+          <svg
+            aria-hidden="true"
+            data-trash
+            viewBox="0 0 24 24"
+            class="hidden size-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 6h18"></path>
+            <path d="M8 6V4h8v2"></path>
+            <path d="M19 6l-1 14H6L5 6"></path>
+            <path d="M10 11v6M14 11v6"></path>
+          </svg>
         </button>
         <output
-          class="w-8 text-center text-lg font-bold tabular-nums text-white/60"
+          class="w-8 text-center font-semibold tabular-nums"
           data-quantity
-        >
-          0
-        </output>
-        <button
-          type="button"
-          class={stepButton}
-          data-step="1"
-          aria-label={`Eén ${row.name} meer`}
-        >
+        ></output>
+        <button type="button" class={stepButtonClass} data-action="plus">
           +
         </button>
+      </div>
+      <p class="w-20 text-right font-semibold tabular-nums" data-total></p>
+    </li>
+  </template>
+</section>
+
+<noscript>
+  <h2 class="text-xl">Prijs per racket</h2>
+  <ul class="mt-3 divide-y divide-line border-y border-line">
+    <li class="flex justify-between gap-4 py-2">
+      <span>{ownStringLabel}</span>
+      <span class="font-semibold tabular-nums">
+        {formatMoney(servicePriceCents)}
+      </span>
+    </li>
+    {stringOptions.map((option) => (
+      <li class="flex justify-between gap-4 py-2">
+        <span>{option.name}</span>
+        <span class="font-semibold tabular-nums">
+          {formatMoney(servicePriceCents + option.priceCents)}
+        </span>
       </li>
     ))}
   </ul>
+</noscript>
 
-  <div class="mt-4 border-t border-white/30 pt-3">
-    <div id="calc-empty">
-      <p class="font-semibold">Kies hierboven je snaar en aantal.</p>
-      <p class="mt-1 text-sm text-brand-soft">
-        Eigen snaar? Dan betaal je enkel {formatMoney(servicePriceCents)} per
-        racket.
-      </p>
-    </div>
-    <div id="calc-summary" hidden>
-      <ul
-        id="calc-breakdown"
-        class="mb-2 grid gap-1 text-sm text-brand-soft"
-        hidden
-      ></ul>
-      <div class="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
-        <div class="min-w-0">
-          <p class="font-semibold">Totaal</p>
-          <p id="calc-count" class="text-sm text-brand-soft"></p>
-        </div>
-        <p
-          id="calc-total"
-          class="font-display min-w-0 text-3xl tabular-nums sm:text-4xl"
-          aria-live="polite"
-        ></p>
-      </div>
-    </div>
-  </div>
-</section>
 <script>
-  import { formatMoney } from '../lib/formatMoney';
   import { servicePriceCents, stringOptions } from '../data/pricing';
-  import { MAX_QUANTITY } from '../lib/calculatorConfig';
+  import { formatMoney } from '../lib/formatMoney';
   import {
-    stepQuantity,
+    OWN_STRING_NAME,
+    OWN_STRING_VALUE,
+    MAX_QUANTITY,
+  } from '../lib/calculatorConfig';
+  import {
+    addToCart,
+    formatRacketCount,
+    removeLine,
+    setLineQuantity,
     summarizeOrder,
-    type Selection,
+    type Cart,
+    type OrderSummary,
+    type SummaryRow,
   } from '../lib/orderSummary';
 
+  const FLASH_MS = 1000;
+  const FLASH_CLASS = 'bg-brand-soft';
+  const ERROR_TEXT = 'Kies eerst een snaar.';
+
   const pricing = { servicePriceCents, stringOptions };
-  const root = document.querySelector<HTMLElement>('#calculator');
+  const stringNames = new Map<string, string>([
+    [OWN_STRING_VALUE, OWN_STRING_NAME],
+    ...stringOptions.map((option): [string, string] => [
+      option.id,
+      option.name,
+    ]),
+  ]);
 
-  if (root) {
-    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-row]'));
-    const empty = root.querySelector<HTMLElement>('#calc-empty')!;
-    const summary = root.querySelector<HTMLElement>('#calc-summary')!;
-    const breakdown = root.querySelector<HTMLElement>('#calc-breakdown')!;
-    const count = root.querySelector<HTMLElement>('#calc-count')!;
-    const total = root.querySelector<HTMLElement>('#calc-total')!;
-
-    const quantityOf = (row: HTMLElement) =>
-      Number(row.querySelector('[data-quantity]')!.textContent);
-
-    function setQuantity(row: HTMLElement, quantity: number) {
-      const output = row.querySelector<HTMLElement>('[data-quantity]')!;
-      output.textContent = String(quantity);
-      output.classList.toggle('text-white/60', quantity === 0);
-      row.classList.toggle('bg-white/10', quantity > 0);
-      row.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled =
-        quantity === 0;
-      row.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled =
-        quantity === MAX_QUANTITY;
-    }
-
-    function render() {
-      const selections: Selection[] = rows.map((row) => ({
-        id: row.dataset.id!,
-        name: row.getAttribute('aria-label')!,
-        quantity: quantityOf(row),
-      }));
-      const order = summarizeOrder(selections, pricing);
-
-      empty.hidden = order !== null;
-      summary.hidden = order === null;
-      if (!order) return;
-
-      breakdown.hidden = order.rows.length < 2;
-      breakdown.replaceChildren(
-        ...order.rows.map((row) => {
-          const item = document.createElement('li');
-          item.className = 'flex justify-between gap-4';
-          const amount = document.createElement('span');
-          amount.className = 'tabular-nums';
-          amount.textContent = formatMoney(row.totalCents);
-          item.append(row.label, amount);
-          return item;
-        }),
-      );
-      const unit = order.racketCount === 1 ? 'racket' : 'rackets';
-      count.textContent = `${order.racketCount} ${unit}`;
-      total.textContent = formatMoney(order.totalCents);
-    }
-
-    // Hidden without JavaScript: the noscript price list stays the source of truth.
-    root.classList.remove('hidden');
-    root.addEventListener('click', (event) => {
-      const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
-        '[data-step]',
-      );
-      const row = button?.closest<HTMLElement>('[data-row]');
-      if (!button || !row) return;
-      const step = Number(button.dataset.step);
-      setQuantity(row, stepQuantity(quantityOf(row), step));
-      render();
-    });
-    render();
+  function find<T extends Element>(parent: ParentNode, selector: string): T {
+    const element = parent.querySelector<T>(selector);
+    if (!element) throw new Error(`Calculator markup is missing ${selector}`);
+    return element;
   }
+
+  function setUpCalculator(root: HTMLElement) {
+    const form = find<HTMLFormElement>(root, '#calc-form');
+    const select = find<HTMLSelectElement>(root, '#calc-select');
+    const error = find<HTMLElement>(root, '#calc-error');
+    const empty = find<HTMLElement>(root, '#calc-empty');
+    const cartPanel = find<HTMLElement>(root, '#calc-cart');
+    const list = find<HTMLElement>(root, '#calc-lines');
+    const count = find<HTMLElement>(root, '#calc-count');
+    const total = find<HTMLElement>(root, '#calc-total');
+    const status = find<HTMLElement>(root, '#calc-status');
+    const template = find<HTMLTemplateElement>(root, '#calc-line-template');
+
+    // The cart is the single source of truth; the DOM is only ever rendered from it.
+    let cart: Cart = [];
+    const lineElements = new Map<string, HTMLElement>();
+    const flashTimers = new Map<string, number>();
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    );
+
+    function announce(message: string) {
+      // Clearing first makes screen readers repeat an identical message.
+      status.textContent = '';
+      requestAnimationFrame(() => {
+        status.textContent = message;
+      });
+    }
+
+    function describeOrder(order: OrderSummary | null): string {
+      if (!order) return 'Je totaal is leeg.';
+      return `${formatRacketCount(order.racketCount)}, totaal ${formatMoney(order.totalCents)}.`;
+    }
+
+    function updateLine(line: HTMLElement, row: SummaryRow) {
+      const atMax = row.quantity >= MAX_QUANTITY;
+      const isLastRacket = row.quantity === 1;
+      line.setAttribute('aria-label', row.name);
+      find(line, '[data-name]').textContent = row.name;
+      find(line, '[data-unit]').textContent =
+        `${formatMoney(row.unitCents)} per racket`;
+      find(line, '[data-quantity]').textContent = String(row.quantity);
+      find(line, '[data-total]').textContent = formatMoney(row.totalCents);
+      find<HTMLElement>(line, '[data-max-hint]').hidden = !atMax;
+
+      const minus = find<HTMLButtonElement>(line, '[data-action="minus"]');
+      minus.setAttribute(
+        'aria-label',
+        isLastRacket ? `Verwijder ${row.name}` : `Eén ${row.name} minder`,
+      );
+      find<HTMLElement>(line, '[data-minus-glyph]').hidden = isLastRacket;
+      find<SVGElement>(line, '[data-trash]').classList.toggle(
+        'hidden',
+        !isLastRacket,
+      );
+
+      const plus = find<HTMLButtonElement>(line, '[data-action="plus"]');
+      plus.setAttribute('aria-label', `Eén ${row.name} meer`);
+      plus.disabled = atMax;
+    }
+
+    function createLine(id: string): HTMLElement {
+      const line = (template.content.cloneNode(true) as DocumentFragment)
+        .firstElementChild as HTMLElement;
+      line.dataset.id = id;
+      lineElements.set(id, line);
+      return line;
+    }
+
+    /** Updates lines in place (keeping focus on the pressed button) and fixes their order. */
+    function syncLines(rows: readonly SummaryRow[]) {
+      const wanted = new Set(rows.map((row) => row.id));
+      for (const [id, line] of lineElements) {
+        if (wanted.has(id)) continue;
+        line.remove();
+        lineElements.delete(id);
+      }
+      rows.forEach((row, index) => {
+        const line = lineElements.get(row.id) ?? createLine(row.id);
+        updateLine(line, row);
+        if (list.children[index] !== line) {
+          list.insertBefore(line, list.children[index] ?? null);
+        }
+      });
+    }
+
+    function render(): OrderSummary | null {
+      const order = summarizeOrder(cart, pricing);
+      empty.hidden = order !== null;
+      cartPanel.hidden = order === null;
+      syncLines(order?.rows ?? []);
+      if (order) {
+        count.textContent = formatRacketCount(order.racketCount);
+        total.textContent = formatMoney(order.totalCents);
+      }
+      return order;
+    }
+
+    function flash(id: string) {
+      const line = lineElements.get(id);
+      if (!line || prefersReducedMotion.matches) return;
+      window.clearTimeout(flashTimers.get(id));
+      line.classList.add(FLASH_CLASS);
+      flashTimers.set(
+        id,
+        window.setTimeout(() => line.classList.remove(FLASH_CLASS), FLASH_MS),
+      );
+    }
+
+    function showError() {
+      error.textContent = ERROR_TEXT;
+      select.setAttribute('aria-invalid', 'true');
+      select.setAttribute('aria-describedby', error.id);
+    }
+
+    function clearError() {
+      error.textContent = '';
+      select.removeAttribute('aria-invalid');
+      select.removeAttribute('aria-describedby');
+    }
+
+    function addOne(id: string, shouldFlash: boolean) {
+      const name = stringNames.get(id);
+      if (!name) throw new Error(`Unknown string: ${id}`);
+      const { cart: nextCart, outcome } = addToCart(cart, { id, name });
+      if (outcome === 'maxed') {
+        announce(`Maximum bereikt voor ${name}`);
+        return;
+      }
+      cart = nextCart;
+      const order = render();
+      if (outcome === 'merged' && shouldFlash) flash(id);
+      announce(`${name} toegevoegd. ${describeOrder(order)}`);
+    }
+
+    function stepDown(id: string) {
+      const line = cart.find((candidate) => candidate.id === id);
+      if (!line) return;
+      if (line.quantity === 1) {
+        cart = removeLine(cart, id);
+        announce(`${line.name} verwijderd. ${describeOrder(render())}`);
+        select.focus();
+        return;
+      }
+      cart = setLineQuantity(cart, id, line.quantity - 1);
+      announce(`Eén ${line.name} minder. ${describeOrder(render())}`);
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!select.value) {
+        showError();
+        select.focus();
+        return;
+      }
+      clearError();
+      addOne(select.value, true);
+      select.value = '';
+      select.focus();
+    });
+
+    select.addEventListener('change', () => {
+      if (select.value) clearError();
+    });
+
+    list.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>(
+        '[data-action]',
+      );
+      const id = button?.closest<HTMLElement>('[data-line]')?.dataset.id;
+      if (!button || !id) return;
+      if (button.dataset.action === 'plus') addOne(id, false);
+      else stepDown(id);
+    });
+
+    render();
+    // Hidden without JavaScript: the <noscript> price list is shown instead.
+    root.classList.remove('hidden');
+  }
+
+  const root = document.querySelector<HTMLElement>('#calculator');
+  if (root) setUpCalculator(root);
 </script>
