@@ -20,7 +20,7 @@ flowchart LR
 ```
 src/
   data/        single source of truth (pricing.ts, contact.ts)
-  lib/         pure, tested logic (pricing/calculateTotal.ts, money formatting)
+  lib/         pure, tested logic (calculateTotal.ts, money formatting)
   components/  reusable UI (Button, Card, StringFamilyCard, PriceCalculator, LocationMap, ...)
   layouts/     BaseLayout (head/SEO, header, footer)
   pages/       index, prijzen, contact
@@ -48,7 +48,7 @@ docs/          architecture, ADRs, roadmap
 - `calculateTotal` (`src/lib/calculateTotal.ts`) is a pure, unit-tested function: `(service + string) x quantity`, or service only for own strings. `calculateOrder` sums several such lines, so one order can mix string types (e.g. 2 x BG-65 + 1 x BG-80 + 1 own string).
 - The calculator is a static list rendered at build time: one row per string type ("Eigen snaar" first, then every `stringOptions` entry) with its all-in price per racket and a − / + stepper. All quantities start at 0, so there is no silent default.
 - `src/lib/orderSummary.ts` holds the testable logic: `stepQuantity` (clamps 0..`MAX_QUANTITY`) and `summarizeOrder` (drops rows at 0, calls `calculateOrder`, returns breakdown rows, racket count and total; `null` for an empty order so no `€ 0,00` is shown). The script in `PriceCalculator.astro` only reads quantities from the DOM and renders that summary.
-- The footer (hint when empty; breakdown when 2+ rows are active, racket count and total otherwise) is sticky at the bottom of the panel on mobile and static from `sm`. Only the total is an `aria-live` region.
+- The footer (hint when empty; breakdown when 2+ rows are active, racket count and total otherwise) is a plain static block below the rows at every size (a sticky footer hid rows on 320px screens). Only the total is an `aria-live` region.
 - `PriceCalculator.astro` is a progressive enhancement: hidden by default and revealed by its script, so without JavaScript visitors still see the `<noscript>` price list.
 - It reads the same `src/data/pricing.ts` data as the overview, so prices are only ever changed in one place.
 
