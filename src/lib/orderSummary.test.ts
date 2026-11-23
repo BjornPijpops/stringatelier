@@ -5,7 +5,6 @@ import {
   formatRacketCount,
   removeLine,
   setLineQuantity,
-  stepQuantity,
   summarizeOrder,
   type Cart,
 } from './orderSummary';
@@ -22,32 +21,8 @@ const own = { id: OWN_STRING_VALUE, name: 'Eigen snaar' };
 const bg65 = { id: 'bg-65-wit', name: 'BG-65 wit' };
 const bg80 = { id: 'bg-80-wit', name: 'BG-80 wit' };
 
-describe('stepQuantity', () => {
-  it('adds the step to the quantity', () => {
-    expect(stepQuantity(1, 1)).toBe(2);
-    expect(stepQuantity(3, -1)).toBe(2);
-  });
-
-  it('never goes below zero', () => {
-    expect(stepQuantity(0, -1)).toBe(0);
-  });
-
-  it('never goes above the maximum', () => {
-    expect(stepQuantity(MAX_QUANTITY, 1)).toBe(MAX_QUANTITY);
-  });
-});
-
 describe('summarizeOrder', () => {
-  it('returns null when nothing is selected', () => {
-    const selections = [
-      { ...own, quantity: 0 },
-      { ...bg65, quantity: 0 },
-    ];
-
-    expect(summarizeOrder(selections, pricing)).toBeNull();
-  });
-
-  it('returns null for an empty list', () => {
+  it('returns null for an empty cart', () => {
     expect(summarizeOrder([], pricing)).toBeNull();
   });
 
@@ -59,7 +34,6 @@ describe('summarizeOrder', () => {
         {
           ...own,
           quantity: 2,
-          label: '2 × Eigen snaar',
           unitCents: 1200,
           totalCents: 2400,
         },
@@ -69,10 +43,9 @@ describe('summarizeOrder', () => {
     });
   });
 
-  it('combines rows and skips the ones at zero', () => {
+  it('combines rows in cart order', () => {
     const summary = summarizeOrder(
       [
-        { ...own, quantity: 0 },
         { ...bg65, quantity: 1 },
         { ...bg80, quantity: 1 },
       ],
@@ -83,14 +56,12 @@ describe('summarizeOrder', () => {
       {
         ...bg65,
         quantity: 1,
-        label: '1 × BG-65 wit',
         unitCents: 1650,
         totalCents: 1650,
       },
       {
         ...bg80,
         quantity: 1,
-        label: '1 × BG-80 wit',
         unitCents: 1800,
         totalCents: 1800,
       },
@@ -170,6 +141,12 @@ describe('setLineQuantity', () => {
 
   it('removes the line when the quantity drops below 1', () => {
     expect(setLineQuantity(cart, bg65.id, 0)).toEqual([
+      { ...own, quantity: 1 },
+    ]);
+  });
+
+  it('never accepts a negative quantity', () => {
+    expect(setLineQuantity(cart, bg65.id, -3)).toEqual([
       { ...own, quantity: 1 },
     ]);
   });

@@ -47,7 +47,7 @@ docs/          architecture, ADRs, roadmap
 
 - `calculateTotal` (`src/lib/calculateTotal.ts`) is a pure, unit-tested function: `(service + string) x quantity`, or service only for own strings. `calculateOrder` sums several such lines, so one order can mix string types (e.g. 2 x BG-65 + 1 x BG-80 + 1 own string).
 - `PriceCalculator.astro` renders a picker at build time: a native `<select>` with "Kies een snaar…", then "Eigen snaar (alleen besnaren)", then one `<optgroup>` per entry of `stringFamilies` (options like "BG-65 wit · € 16,50"). It scales to many strings; the cards above it are the part that would need rework at ~6+ families (consider horizontal scroll or a disclosure).
-- `src/lib/orderSummary.ts` holds the testable cart logic: `addToCart` (appends, or merges a duplicate with quantity + 1 clamped at `MAX_QUANTITY`, reporting `added`/`merged`/`maxed`), `setLineQuantity`, `removeLine`, `stepQuantity`, `formatRacketCount` and `summarizeOrder` (drops empty lines, calls `calculateOrder`, returns rows with id, name, quantity, unit and line totals, racket count and total; `null` for an empty order so no `€ 0,00` is shown).
+- `src/lib/orderSummary.ts` holds the testable cart logic: `addToCart` (appends, or merges a duplicate with quantity + 1 clamped at `MAX_QUANTITY`, reporting `added`/`merged`/`maxed`), `setLineQuantity`, `removeLine`, `formatRacketCount` and `summarizeOrder` (takes the `Cart`, calls `calculateOrder`, returns rows with id, name, quantity, unit and line totals, racket count and total; `null` for an empty cart so no `€ 0,00` is shown). A cart never holds a line with quantity 0; `setLineQuantity` removes such lines.
 - Calculator flow:
 
 ```mermaid
@@ -61,7 +61,7 @@ flowchart LR
 ```
 
 - The cart array is the single source of truth. The script in `PriceCalculator.astro` re-renders from it (lines come from a `<template>` and are updated in place, so focus stays on the pressed button) and never reads state back from the DOM.
-- Empty state: a short hint and no total. Adding with nothing picked shows "Kies eerst een snaar." (`role="alert"`, `aria-invalid` on the select). After adding, the picker resets and focus returns to it; after removing a line, focus also moves to the picker.
+- Empty state: a short hint and no total. Adding with nothing picked shows "Kies eerst een snaar." (`role="alert"`, `aria-invalid` on the select). After adding, the picker resets and focus returns to it; after removing a line, focus moves to the next line's remove/minus button (the previous line's when the last one was removed), or to the picker when the cart becomes empty. The select gets a red border while invalid.
 - A visually hidden `role="status"` element announces changes ("BG-65 wit toegevoegd. 2 rackets, totaal € 33,00."). The visible total is not a live region, to avoid double announcements.
 - The card is hidden until its script runs; without JavaScript the `<noscript>` price list next to it is shown instead.
 - It reads the same `src/data/pricing.ts` data as the cards, so prices are only ever changed in one place. `summarizeFamilyPrice` (`src/lib/familyPricing.ts`) gives the cards their "from" price and whether colours differ in price.

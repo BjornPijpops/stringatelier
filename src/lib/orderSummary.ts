@@ -15,8 +15,6 @@ export interface SummaryRow {
   readonly id: string;
   readonly name: string;
   readonly quantity: number;
-  /** e.g. "2 × BG-65 wit". */
-  readonly label: string;
   /** Price of one racket on this line (service plus string). */
   readonly unitCents: Cents;
   readonly totalCents: Cents;
@@ -39,9 +37,9 @@ export interface AddResult {
   readonly outcome: AddOutcome;
 }
 
-/** Applies a step to a quantity and keeps the result between 0 and {@link MAX_QUANTITY}. */
-export function stepQuantity(current: number, step: number): number {
-  return Math.min(MAX_QUANTITY, Math.max(0, current + step));
+/** Keeps a quantity between 0 and {@link MAX_QUANTITY}. */
+function clampQuantity(quantity: number): number {
+  return Math.min(MAX_QUANTITY, Math.max(0, quantity));
 }
 
 /**
@@ -75,7 +73,7 @@ export function setLineQuantity(
   quantity: number,
 ): Cart {
   if (quantity < 1) return removeLine(cart, id);
-  const clamped = stepQuantity(quantity, 0);
+  const clamped = clampQuantity(quantity);
   return cart.map((line) =>
     line.id === id ? { ...line, quantity: clamped } : line,
   );
@@ -92,18 +90,17 @@ export function formatRacketCount(count: number): string {
 }
 
 /**
- * Prices the selections that have at least one racket.
- * Returns `null` for an empty order, so callers never show a meaningless total.
+ * Prices every line of the cart (a cart never holds a line without rackets).
+ * Returns `null` for an empty cart, so callers never show a meaningless total.
  */
 export function summarizeOrder(
-  selections: readonly Selection[],
+  cart: Cart,
   pricing: PricingData,
 ): OrderSummary | null {
-  const chosen = selections.filter((selection) => selection.quantity > 0);
-  if (chosen.length === 0) return null;
+  if (cart.length === 0) return null;
 
   const order = calculateOrder(
-    chosen.map(({ id, quantity }) => ({
+    cart.map(({ id, quantity }) => ({
       stringId: id === OWN_STRING_VALUE ? null : id,
       quantity,
     })),
@@ -111,18 +108,17 @@ export function summarizeOrder(
   );
 
   return {
-    rows: chosen.map(({ id, name, quantity }, index) => {
+    rows: cart.map(({ id, name, quantity }, index) => {
       const { totalCents } = order.lines[index];
       return {
         id,
         name,
         quantity,
-        label: `${quantity} × ${name}`,
         unitCents: totalCents / quantity,
         totalCents,
       };
     }),
-    racketCount: chosen.reduce((sum, { quantity }) => sum + quantity, 0),
+    racketCount: cart.reduce((sum, { quantity }) => sum + quantity, 0),
     totalCents: order.totalCents,
   };
 }
