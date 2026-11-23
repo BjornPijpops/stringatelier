@@ -1,31 +1,36 @@
 import type { Cents, StringFamily } from '../data/pricing';
 
-export interface FamilyPriceSummary {
-  /** Price of the cheapest variant's string alone. */
+/** Variants of one family that share the same string price. */
+export interface PriceGroup {
+  /** Price of the string alone. */
   readonly stringCents: Cents;
-  /** Service plus the cheapest variant: what the customer pays per racket at minimum. */
+  /** Service plus string: what the customer pays per racket. */
   readonly totalCents: Cents;
-  /** True when the variants are priced differently, so the total should read "vanaf". */
-  readonly differs: boolean;
+  /** Colours at this price, in data order. */
+  readonly colours: string[];
 }
 
 /**
- * Summarises what a racket costs with a string of this family.
+ * Groups a family's variants by identical string price, cheapest group first.
  * @throws if the family has no variants.
  */
-export function summarizeFamilyPrice(
+export function groupFamilyPrices(
   family: StringFamily,
   servicePriceCents: Cents,
-): FamilyPriceSummary {
+): PriceGroup[] {
   if (family.variants.length === 0) {
     throw new Error(`String family ${family.id} has no variants`);
   }
-  const prices = family.variants.map((variant) => variant.priceCents);
-  const stringCents = Math.min(...prices);
+  const byPrice = new Map<Cents, string[]>();
+  for (const { priceCents, colour } of family.variants) {
+    byPrice.set(priceCents, [...(byPrice.get(priceCents) ?? []), colour]);
+  }
 
-  return {
-    stringCents,
-    totalCents: servicePriceCents + stringCents,
-    differs: Math.max(...prices) !== stringCents,
-  };
+  return [...byPrice]
+    .sort(([a], [b]) => a - b)
+    .map(([stringCents, colours]) => ({
+      stringCents,
+      totalCents: servicePriceCents + stringCents,
+      colours,
+    }));
 }

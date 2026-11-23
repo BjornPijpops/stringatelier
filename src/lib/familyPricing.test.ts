@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { StringFamily } from '../data/pricing';
-import { summarizeFamilyPrice } from './familyPricing';
+import { groupFamilyPrices } from './familyPricing';
 
 const SERVICE_CENTS = 1200;
 
@@ -21,33 +21,48 @@ function familyWith(...prices: number[]): StringFamily {
   };
 }
 
-describe('summarizeFamilyPrice', () => {
-  it('adds the string price to the service price', () => {
-    expect(summarizeFamilyPrice(familyWith(450), SERVICE_CENTS)).toEqual({
-      stringCents: 450,
-      totalCents: 1650,
-      differs: false,
-    });
+describe('groupFamilyPrices', () => {
+  it('returns one group for a single variant', () => {
+    expect(groupFamilyPrices(familyWith(450), SERVICE_CENTS)).toEqual([
+      { stringCents: 450, totalCents: 1650, colours: ['kleur 0'] },
+    ]);
   });
 
-  it('does not flag a difference when all variants cost the same', () => {
-    const summary = summarizeFamilyPrice(familyWith(450, 450), SERVICE_CENTS);
+  it('merges variants with equal prices into one group', () => {
+    const groups = groupFamilyPrices(familyWith(450, 450), SERVICE_CENTS);
 
-    expect(summary.differs).toBe(false);
+    expect(groups).toEqual([
+      { stringCents: 450, totalCents: 1650, colours: ['kleur 0', 'kleur 1'] },
+    ]);
   });
 
-  it('uses the cheapest variant and flags a difference when prices vary', () => {
-    const summary = summarizeFamilyPrice(familyWith(600, 450), SERVICE_CENTS);
+  it('returns separate groups sorted by price, cheapest first', () => {
+    const groups = groupFamilyPrices(familyWith(600, 450), SERVICE_CENTS);
 
-    expect(summary).toEqual({
-      stringCents: 450,
-      totalCents: 1650,
-      differs: true,
-    });
+    expect(groups.map((group) => group.stringCents)).toEqual([450, 600]);
+    expect(groups.map((group) => group.colours)).toEqual([
+      ['kleur 1'],
+      ['kleur 0'],
+    ]);
+  });
+
+  it('groups mixed prices and keeps colours in data order', () => {
+    const groups = groupFamilyPrices(familyWith(450, 600, 450), SERVICE_CENTS);
+
+    expect(groups).toEqual([
+      { stringCents: 450, totalCents: 1650, colours: ['kleur 0', 'kleur 2'] },
+      { stringCents: 600, totalCents: 1800, colours: ['kleur 1'] },
+    ]);
+  });
+
+  it('adds the service price to every group', () => {
+    const groups = groupFamilyPrices(familyWith(450, 600), SERVICE_CENTS);
+
+    expect(groups.map((group) => group.totalCents)).toEqual([1650, 1800]);
   });
 
   it('throws for a family without variants', () => {
-    expect(() => summarizeFamilyPrice(familyWith(), SERVICE_CENTS)).toThrow(
+    expect(() => groupFamilyPrices(familyWith(), SERVICE_CENTS)).toThrow(
       /no variants/,
     );
   });
